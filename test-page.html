@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas & Comet Agent Test Lab</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 30px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+    }
+    h1 { color: #818cf8; margin-bottom: 8px; }
+    p { color: #94a3b8; font-size: 14px; margin-bottom: 16px; }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    label { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #cbd5e1; }
+    input, textarea, select {
+      background: #0f172a;
+      border: 1px solid #475569;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    button {
+      background: #6366f1;
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { background: #4f46e5; }
+    .cookie-banner {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #334155;
+      border: 1px solid #6366f1;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+    canvas {
+      background: #334155;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Atlas & Comet Local Agent Test Lab</h1>
+  <p>Use this page to test DOM layout scanning, PII redaction, form filling, and modal dismissal.</p>
+
+  <div class="card">
+    <h2>1. Form Filling & Action Target</h2>
+    <form id="sampleForm" onsubmit="event.preventDefault(); alert('Form submitted successfully!');">
+      <div class="form-group">
+        <label for="searchQuery">Search Query</label>
+        <input type="text" id="searchQuery" placeholder="e.g. AI Agents in Web Browsers" />
+      </div>
+
+      <div class="form-group">
+        <label for="userEmail">User Email (Test PII Filter)</label>
+        <input type="email" id="userEmail" value="john.doe@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="userPhone">User Phone (Test PII Filter)</label>
+        <input type="text" id="userPhone" value="+1 (555) 234-5678" />
+      </div>
+
+      <button type="submit" id="submitBtn">Search & Submit Form</button>
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>2. Visual Canvas Inspection Target</h2>
+    <p>Visual ML (YOLO + PP-OCR) fallback processes non-DOM elements like canvases below:</p>
+    <canvas id="testCanvas" width="400" height="100"></canvas>
+  </div>
+
+  <!-- Cookie Modal Overlay -->
+  <div class="cookie-banner" id="cookieOverlay">
+    <p style="color: white; margin-bottom: 8px;"><strong>We use cookies:</strong> Accept to continue testing.</p>
+    <button id="acceptCookiesBtn" onclick="document.getElementById('cookieOverlay').style.display='none'">Accept Cookies</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('testCanvas');
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = '#6366f1';
+    ctx.fillRect(10, 10, 380, 80);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '16px sans-serif';
+    ctx.fillText('Interactive Canvas Chart Node', 30, 50);
+  </script>
+</body>
+</html>

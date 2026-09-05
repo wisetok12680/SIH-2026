@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atlas & Comet Hybrid Agent</title>
+  <link rel="stylesheet" href="panel.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <div class="logo-icon">✨</div>
+        <div>
+          <h1 class="app-title">Atlas & Comet</h1>
+          <p class="app-subtitle">Hybrid Local & Cloud Agent</p>
+        </div>
+      </div>
+      <div class="badge-group">
+        <div class="route-badge local" id="routingBadge">LOCAL AGENT</div>
+        <div class="status-badge" id="agentStatusBadge">IDLE</div>
+      </div>
+    </header>
+
+    <!-- CAPTCHA Alert Banner (Hidden by default) -->
+    <div class="captcha-banner" id="captchaBanner" style="display: none;">
+      <div class="captcha-icon">⚠️</div>
+      <div class="captcha-info">
+        <span class="captcha-title">CAPTCHA Challenge Detected</span>
+        <span class="captcha-desc">Please solve the CAPTCHA in the main browser window. Automation will auto-resume!</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="nav-btn active" data-tab="tab-control">Control Center</button>
+      <button class="nav-btn" data-tab="tab-ax">AX Ref Tree (@e1)</button>
+      <button class="nav-btn" data-tab="tab-map">Physical Map</button>
+      <button class="nav-btn" data-tab="tab-settings">Config & Cache</button>
+    </nav>
+
+    <!-- Tab 1: Control Center -->
+    <main class="tab-content active" id="tab-control">
+      <!-- Task Prompt Input -->
+      <section class="card input-card">
+        <label for="taskPrompt" class="card-label">Task Goal & Instructions</label>
+        <textarea 
+          id="taskPrompt" 
+          class="task-textarea" 
+          placeholder="e.g. Search for 'Local GUI Agents' and submit form..."
+          rows="3"
+        ></textarea>
+        
+        <div class="button-group">
+          <button id="startAgentBtn" class="btn btn-primary">
+            <span class="btn-icon">▶</span> Start Task
+          </button>
+          <button id="stopAgentBtn" class="btn btn-danger" disabled>
+            <span class="btn-icon">⏹</span> Stop
+          </button>
+        </div>
+      </section>
+
+      <!-- Quick Action Shortcuts -->
+      <section class="card shortcuts-card">
+        <label class="card-label">Quick Presets</label>
+        <div class="chip-group">
+          <button class="chip" data-preset="Search for 'Local GUI Agents' and submit form">🔎 Search & Submit</button>
+          <button class="chip" data-preset="Fill user email and phone with test values">📝 Fill PrivScope Form</button>
+          <button class="chip" data-preset="Scan Accessibility Tree and list all @e Ref tags">🌐 Scan AX Tree</button>
+          <button class="chip" data-preset="Dismiss cookie popups and overlays">🛡️ Dismiss Banners</button>
+        </div>
+      </section>
+
+      <!-- Live Execution Log -->
+      <section class="card log-card">
+        <div class="card-header">
+          <label class="card-label">Live Trajectory Logs</label>
+          <button id="clearLogsBtn" class="btn-text">Clear</button>
+        </div>
+        <div class="log-container" id="logContainer">
+          <div class="log-entry log-info">
+            <span class="log-time">[System]</span> Ready. Hybrid routing engine & PrivScope active.
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Tab 2: Accessibility Ref Tree (@e1, @e2...) -->
+    <main class="tab-content" id="tab-ax">
+      <section class="card map-card">
+        <div class="card-header">
+          <label class="card-label">Accessibility Tree Refs Snapshot</label>
+          <button id="scanAxBtn" class="btn-secondary">Refresh Tree</button>
+        </div>
+        <p class="card-desc">Stripped semantic nodes tagged with stable Reference IDs (@e1, @e2...)</p>
+        <div class="ax-tree-view" id="axTreeView">
+          <div class="empty-state">Click "Refresh Tree" or launch a task to generate Reference IDs...</div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Tab 3: Structural Layout Map -->
+    <main class="tab-content" id="tab-map">
+      <section class="card map-card">
+        <div class="card-header">
+          <label class="card-label">Single JSON Array Physical Map</label>
+          <button id="refreshMapBtn" class="btn-secondary">Scan Map</button>
+        </div>
+        <pre class="json-viewer" id="jsonViewer"><code>Click "Scan Map" to view physical bounding map...</code></pre>
+      </section>
+    </main>
+
+    <!-- Tab 4: Config & Trajectory Cache -->
+    <main class="tab-content" id="tab-settings">
+      <section class="card settings-card">
+        <label class="card-label">Engine & Cache Settings</label>
+        
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-title">Trajectory Caching & Fast Replay</span>
+            <span class="setting-desc">Replay validated task trajectories directly without AI calls</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleTrajectoryCache" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-title">PrivScope Local Binding</span>
+            <span class="setting-desc">Keep sensitive credentials strictly on-device in Local Binding Table</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="togglePrivScope" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-item">
+          <div class="setting-info">
+            <span class="setting-title">Auto-Dismiss Overlays</span>
+            <span class="setting-desc">Auto handle cookie popups and unexpected dialogs</span>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="toggleAutoModals" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div style="margin-top: 10px;">
+          <button id="clearCacheBtn" class="btn btn-secondary" style="width: 100%;">⚡ Clear All Cached Trajectories</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer Status Bar -->
+    <footer class="footer">
+      <div class="footer-item">
+        <span class="indicator active"></span> PrivScope & AXTree Active
+      </div>
+      <div class="footer-item">v1.1.0 Hybrid</div>
+    </footer>
+  </div>
+
+  <script src="panel.js" type="module"></script>
+</body>
+</html>
