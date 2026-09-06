@@ -5,3 +5,11 @@ python-multipart>=0.0.6
 pillow>=9.5.0
 numpy>=1.24.0
 opencv-python-headless>=4.7.0
+torch
+transformers
+peft
+trl
+bitsandbytes
+datasets
+accelerate
+

@@ -116,12 +116,26 @@ async def generate_agent_plan(req: PlanRequest):
                 "selector": el.get("selector")
             }
 
-    return {
-        "thought": "No further target elements identified for goal",
-        "action": "FINISH",
-        "value": "Completed plan"
-    }
+class SanitizeRequest(BaseModel):
+    text: str
+
+class SanitizeResponse(BaseModel):
+    sanitized_text: str
+
+@app.post("/api/sanitize-pii", response_model=SanitizeResponse)
+async def sanitize_pii_endpoint(req: SanitizeRequest):
+    """
+    Sanitizes raw webpage text/JSON by stripping sensitive PII information.
+    """
+    import re
+    text = req.text
+    text = re.sub(r'[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', '[REDACTED_EMAIL]', text)
+    text = re.sub(r'(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}', '[REDACTED_PHONE]', text)
+    text = re.sub(r'\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})\b', '[REDACTED_CARD]', text)
+    text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '[REDACTED_SSN]', text)
+    return SanitizeResponse(sanitized_text=text)
 
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+
