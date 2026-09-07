@@ -1,0 +1,63 @@
+{
+  "routing_metadata": {
+    "detected_route": "CLOUD_AGENT",
+    "routing_reason": "Heavy Analytical Synthesis & Contract Risk Evaluation (Exceeds Local On-Device Agent Capacity -> Dispatching Payload JSON to External LLM)",
+    "local_agent_capacity_exceeded": true,
+    "timestamp": "2026-09-08T04:47:00.000Z"
+  },
+  "prompt": "Perform a multi-vendor contract compliance & financial risk analysis across all enterprise tables, extract high-risk audit flags, and generate a recommended procurement decision matrix.",
+  "page_info": {
+    "title": "Sub-Page 7: Enterprise Contract Compliance & Financial Risk Matrix",
+    "url": "file:///c:/Users/sriva/SIH-2026/test-page.html#subpage-7",
+    "elements": [
+      {
+        "ref": "@e1",
+        "role": "table",
+        "name": "Vendor Multi-Attribute Contract Risk Matrix",
+        "tagName": "TABLE",
+        "text": "Vendor A: Apex Cloud Systems | SLA: 99.9% | Annual Cost: $480,000 | Penalty Clause: 5% credit | Compliance Score: 88% [AUDIT_FLAG: High Overage Rates]"
+      },
+      {
+        "ref": "@e2",
+        "role": "table",
+        "name": "Vendor Multi-Attribute Contract Risk Matrix",
+        "tagName": "TABLE",
+        "text": "Vendor B: Sentinel Cyber Solutions | SLA: 99.99% | Annual Cost: $620,000 | Penalty Clause: 15% credit | Compliance Score: 96% [STATUS: Recommended Tier-1]"
+      },
+      {
+        "ref": "@e3",
+        "role": "table",
+        "name": "Vendor Multi-Attribute Contract Risk Matrix",
+        "tagName": "TABLE",
+        "text": "Vendor C: Global Tech Infra | SLA: 98.5% | Annual Cost: $390,000 | Penalty Clause: None | Compliance Score: 72% [CRITICAL_FLAG: SLA Breach Exposure]"
+      },
+      {
+        "ref": "@e4",
+        "role": "button",
+        "name": "Generate Executive Risk Analysis Report",
+        "tagName": "BUTTON",
+        "disabled": false
+      },
+      {
+        "ref": "@e5",
+        "role": "button",
+        "name": "Approve Sentinel Cyber Contract",
+        "tagName": "BUTTON",
+        "disabled": false
+      }
+    ]
+  },
+  "privacy_guarantees": {
+    "pii_filter_active": true,
+    "sanitized_tokens": 0,
+    "local_binding_table_keys": []
+  },
+  "history": [
+    {
+      "step": 1,
+      "action": "SCROLL",
+      "targetRef": "@e1",
+      "thought": "Scanned enterprise vendor risk comparison table."
+    }
+  ]
+}

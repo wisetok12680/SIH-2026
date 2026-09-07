@@ -305,6 +305,9 @@
       <button class="subpage-btn" id="btn-subpage-6" onclick="switchSubpage(6)">
         6. Job Application Form
       </button>
+      <button class="subpage-btn" id="btn-subpage-7" onclick="switchSubpage(7)">
+        7. Contract Risk Synthesis
+      </button>
     </nav>
 
     <!-- SUB-PAGE 1: AX Tree Layout & Reference IDs -->
@@ -580,6 +583,72 @@
       </div>
     </div>
 
+    <!-- SUB-PAGE 7: Heavy Analytical Synthesis & Financial Contract Risk Matrix -->
+    <div class="subpage-view" id="subpage-7">
+      <div class="station-card">
+        <div class="station-header">
+          <div>
+            <div class="station-title">Sub-Page 7: Enterprise Contract Compliance & Financial Risk Matrix</div>
+            <div class="station-desc">Heavy analytical synthesis lab. Exceeds local agent capacity -> triggers cloud LLM JSON payload dispatching.</div>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto; margin-bottom: 20px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
+            <thead>
+              <tr style="background: #0f172a; border-bottom: 2px solid var(--card-border);">
+                <th style="padding: 10px; color: var(--text-muted);">Vendor Name</th>
+                <th style="padding: 10px; color: var(--text-muted);">SLA Guarantee</th>
+                <th style="padding: 10px; color: var(--text-muted);">Annual Cost</th>
+                <th style="padding: 10px; color: var(--text-muted);">Penalty Clause</th>
+                <th style="padding: 10px; color: var(--text-muted);">Compliance Score</th>
+                <th style="padding: 10px; color: var(--text-muted);">Audit Flag</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--card-border);">
+                <td style="padding: 10px; font-weight: 600;">Apex Cloud Systems</td>
+                <td style="padding: 10px;">99.9% Availability</td>
+                <td style="padding: 10px;">$480,000 / yr</td>
+                <td style="padding: 10px;">5% SLA Credit</td>
+                <td style="padding: 10px; color: #f59e0b; font-weight: 600;">88%</td>
+                <td style="padding: 10px; color: #f87171;">High Overage Rate</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--card-border); background: rgba(5, 150, 105, 0.08);">
+                <td style="padding: 10px; font-weight: 600; color: #34d399;">Sentinel Cyber Solutions</td>
+                <td style="padding: 10px;">99.99% Availability</td>
+                <td style="padding: 10px;">$620,000 / yr</td>
+                <td style="padding: 10px;">15% SLA Credit</td>
+                <td style="padding: 10px; color: #34d399; font-weight: 600;">96%</td>
+                <td style="padding: 10px; color: #34d399;">Recommended Tier-1</td>
+              </tr>
+              <tr style="border-bottom: 1px solid var(--card-border);">
+                <td style="padding: 10px; font-weight: 600;">Global Tech Infra</td>
+                <td style="padding: 10px;">98.5% Availability</td>
+                <td style="padding: 10px;">$390,000 / yr</td>
+                <td style="padding: 10px;">None (No Penalty)</td>
+                <td style="padding: 10px; color: #ef4444; font-weight: 600;">72%</td>
+                <td style="padding: 10px; color: #ef4444;">SLA Breach Exposure</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; gap: 12px;">
+          <button class="btn" id="btn-gen-report" onclick="generateContractReport()">
+            Generate Executive Risk Analysis Report
+          </button>
+          <button class="btn btn-secondary" id="btn-approve-sentinel" onclick="logConsole('Approved Sentinel Cyber Contract ($620,000/yr).')">
+            Approve Sentinel Cyber Contract
+          </button>
+        </div>
+
+        <div class="console-out" id="console-subpage-7">
+          [System] Sub-Page 7 active. Heavy multi-attribute enterprise matrix loaded.
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Cookie Modal Overlay -->
@@ -699,6 +768,12 @@
       const role = document.getElementById('jobExperience')?.value || '5 years';
       logConsole(`JOB APPLICATION SUBMITTED SUCCESSFULLY! Candidate: ${name} (${role} experience)`);
       alert(`Application Submitted Successfully!\nCandidate: ${name}\nStatus: Processed Agentically by Atlas & Comet!`);
+    }
+
+    // Sub-Page 7: Heavy Analytical Report Generator
+    function generateContractReport() {
+      logConsole('HEAVY CONTRACT SYNTHESIS EXECUTED! Cloud LLM evaluated 3 vendors. Recommendation: Sentinel Cyber Solutions (99.99% SLA, 96% compliance).');
+      alert('Executive Risk Analysis Report Generated!\n\nCloud LLM Recommendation: Sentinel Cyber Solutions\nReasoning: 99.99% SLA Uptime, 15% SLA penalty credit clause, 96% compliance score.');
     }
 
     // Initialize

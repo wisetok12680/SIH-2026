@@ -47,11 +47,12 @@ export class HybridDynamicRouter {
       };
     }
 
-    // Rule 3: Complex multi-step reasoning or high step count -> Cloud Agent Fallback
-    if (currentStep > 4 || /analyze|compare|extract summary|semantic plan/i.test(taskLower)) {
+    // Rule 3: Heavy Analytical Synthesis & Multi-Attribute Trade-off Reasoning -> External Cloud LLM
+    const isHeavyAnalyticalTask = /analyze|compare|contract|compliance|risk|procurement|vendor|audit|synthesis|multi-attribute|financial|recommend/i.test(taskLower);
+    if (isHeavyAnalyticalTask || currentStep > 4) {
       return {
         route: 'CLOUD_AGENT',
-        reason: 'Complex Semantic Reasoning / Multi-step Fallback'
+        reason: 'Heavy Analytical Synthesis & Contract Risk Evaluation (Exceeds Local On-Device Agent Capacity -> Dispatching Payload JSON to External LLM)'
       };
     }
 
