@@ -3,114 +3,623 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atlas & Comet Agent Test Lab</title>
+  <title>Atlas & Comet Agent - Feature Showcase & Test Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: rgba(22, 30, 46, 0.75);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-hover-border: rgba(99, 102, 241, 0.4);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent-cyan: #06b6d4;
+      --accent-purple: #a855f7;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: #0f172a;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
     body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
-      padding: 30px;
-      max-width: 800px;
+      font-family: var(--font-sans);
+      background: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 15% 15%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 85% 85%, rgba(168, 85, 247, 0.12) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: var(--text-main);
+      padding: 40px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1040px;
       margin: 0 auto;
     }
-    .card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      padding: 20px;
-      border-radius: 12px;
+
+    /* Header Banner */
+    .hero-header {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent-cyan), var(--accent-purple));
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    .hero-subtitle {
+      color: var(--text-muted);
+      font-size: 15px;
+      max-width: 760px;
+    }
+
+    /* Grid Layout */
+    .stations-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    @media (min-width: 860px) {
+      .stations-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .full-width {
+        grid-column: span 2;
+      }
+    }
+
+    /* Card Styling */
+    .station-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(16px);
+      border-radius: 14px;
+      padding: 24px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    .station-card:hover {
+      border-color: var(--card-hover-border);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      transform: translateY(-2px);
+    }
+
+    .station-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-cyan);
+      margin-bottom: 6px;
+    }
+
+    .station-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .station-desc {
+      font-size: 13px;
+      color: var(--text-muted);
       margin-bottom: 20px;
     }
-    h1 { color: #818cf8; margin-bottom: 8px; }
-    p { color: #94a3b8; font-size: 14px; margin-bottom: 16px; }
+
+    /* Form Inputs & Controls */
     .form-group {
       display: flex;
       flex-direction: column;
       gap: 6px;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
     }
-    label { font-size: 12px; font-weight: 600; text-transform: uppercase; color: #cbd5e1; }
-    input, textarea, select {
-      background: #0f172a;
-      border: 1px solid #475569;
-      color: white;
-      padding: 10px;
-      border-radius: 6px;
+
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    select,
+    textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid #334155;
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: 8px;
       font-size: 14px;
+      font-family: inherit;
+      transition: border-color 0.2s ease;
     }
-    button {
-      background: #6366f1;
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .row-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--primary);
       color: white;
       border: none;
       padding: 10px 18px;
-      border-radius: 6px;
+      border-radius: 8px;
       font-weight: 600;
-      cursor: pointer;
       font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
     }
-    button:hover { background: #4f46e5; }
-    .cookie-banner {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
+
+    .btn:hover {
+      background: var(--primary-hover);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-secondary {
       background: #334155;
-      border: 1px solid #6366f1;
-      padding: 16px;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      color: var(--text-main);
     }
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    .btn-amber {
+      background: var(--accent-amber);
+      color: #0f172a;
+    }
+    .btn-amber:hover {
+      background: #d97706;
+      color: white;
+    }
+
+    /* Redaction Preview Box */
+    .preview-box {
+      background: #090d16;
+      border: 1px dashed rgba(99, 102, 241, 0.4);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #38bdf8;
+      margin-top: 12px;
+      word-break: break-all;
+    }
+
+    /* Canvas Harness */
     canvas {
-      background: #334155;
+      background: #0f172a;
+      border: 1px solid #334155;
       border-radius: 8px;
+      width: 100%;
+      height: 140px;
+      margin-top: 8px;
+    }
+
+    /* Simulated Overlays & CAPTCHA */
+    .overlay-box {
+      background: rgba(30, 41, 59, 0.9);
+      border: 1px solid var(--accent-amber);
+      padding: 16px;
+      border-radius: 10px;
+      margin-top: 12px;
+      position: relative;
+    }
+
+    .captcha-frame {
+      border: 2px dashed var(--accent-rose);
+      background: #1e1b4b;
+      padding: 18px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 14px;
+    }
+
+    .captcha-frame h4 {
+      color: #f43f5e;
+      font-size: 14px;
+      margin-bottom: 6px;
+    }
+
+    /* Step Wizard UI */
+    .wizard-steps {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .wizard-step {
+      flex: 1;
+      padding: 8px;
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: center;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .wizard-step.active {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: var(--primary);
+      color: #a5b4fc;
+    }
+
+    /* Output Console */
+    .console-out {
+      background: #030712;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #10b981;
+      height: 100px;
+      overflow-y: auto;
       margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <h1>Atlas & Comet Local Agent Test Lab</h1>
-  <p>Use this page to test DOM layout scanning, PII redaction, form filling, and modal dismissal.</p>
 
-  <div class="card">
-    <h2>1. Form Filling & Action Target</h2>
-    <form id="sampleForm" onsubmit="event.preventDefault(); alert('Form submitted successfully!');">
-      <div class="form-group">
-        <label for="searchQuery">Search Query</label>
-        <input type="text" id="searchQuery" placeholder="e.g. AI Agents in Web Browsers" />
-      </div>
+  <div class="container">
+    <!-- Header -->
+    <header class="hero-header">
+      <div class="badge-pill">✨ Interactive Agent Test Suite</div>
+      <h1 class="hero-title">Atlas & Comet Local Agent Feature Showcase</h1>
+      <p class="hero-subtitle">
+        This complete test lab exercises all 5 core goals of the Atlas & Comet agent: physical layout extraction, 
+        client-side PII filtering, Accessibility Tree Ref tagging (@e1, @e2...), modal auto-dismissal, CAPTCHA pause/resume, and fast trajectory replay caching.
+      </p>
+    </header>
 
-      <div class="form-group">
-        <label for="userEmail">User Email (Test PII Filter)</label>
-        <input type="email" id="userEmail" value="john.doe@example.com" />
-      </div>
+    <div class="stations-grid">
 
-      <div class="form-group">
-        <label for="userPhone">User Phone (Test PII Filter)</label>
-        <input type="text" id="userPhone" value="+1 (555) 234-5678" />
-      </div>
+      <!-- Station 1: Physical Layout & AX Tree Harness -->
+      <section class="station-card">
+        <div class="station-tag">Station 1 • Layout & AX Tree</div>
+        <h3 class="station-title">🌐 DOM Layout & Reference Tagging (@e1)</h3>
+        <p class="station-desc">Contains standard interactive elements for physical coordinate calculation and AX Tree snapshot generation.</p>
 
-      <button type="submit" id="submitBtn">Search & Submit Form</button>
-    </form>
-  </div>
+        <form id="station1Form" onsubmit="event.preventDefault(); logConsole('Station 1 Form Submitted!');">
+          <div class="form-group">
+            <label for="searchQuery">Search Query (Input Target)</label>
+            <input type="text" id="searchQuery" placeholder="e.g. Autonomous Local AI Agents" value="Atlas & Comet Agent Architecture" />
+          </div>
 
-  <div class="card">
-    <h2>2. Visual Canvas Inspection Target</h2>
-    <p>Visual ML (YOLO + PP-OCR) fallback processes non-DOM elements like canvases below:</p>
-    <canvas id="testCanvas" width="400" height="100"></canvas>
+          <div class="row-group">
+            <div class="form-group">
+              <label for="categorySelect">Category Select</label>
+              <select id="categorySelect">
+                <option value="layout">Physical Layout Mapping</option>
+                <option value="privacy">Privacy & PII Filter</option>
+                <option value="automation">Web Action Execution</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="priorityLevel">Priority Level</label>
+              <input type="number" id="priorityLevel" value="1" min="1" max="5" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Agent Preferences (Checkboxes)</label>
+            <div style="display: flex; gap: 14px; margin-top: 4px;">
+              <label style="font-weight: normal; text-transform: none;"><input type="checkbox" id="chk1" checked /> Auto-Scroll</label>
+              <label style="font-weight: normal; text-transform: none;"><input type="checkbox" id="chk2" checked /> Local Routing</label>
+            </div>
+          </div>
+
+          <button type="submit" id="submitSearchBtn" class="btn" style="width: 100%;">
+            🔎 Submit Search & Action Target
+          </button>
+        </form>
+      </section>
+
+      <!-- Station 2: PrivScope & PII Detection Verification Station -->
+      <section class="station-card">
+        <div class="station-tag">Station 2 • Privacy & PII</div>
+        <h3 class="station-title">🛡️ PrivScope & PII Redaction Filter</h3>
+        <p class="station-desc">Pre-filled with sensitive personal data. Test client-side PII regex masking and on-device $BIND_* key binding.</p>
+
+        <div class="form-group">
+          <label for="userEmail">Email Address</label>
+          <input type="email" id="userEmail" value="alex.engineer@example.com" oninput="updatePiiPreview()" />
+        </div>
+
+        <div class="form-group">
+          <label for="userPhone">Phone Number</label>
+          <input type="text" id="userPhone" value="+1 (555) 987-6543" oninput="updatePiiPreview()" />
+        </div>
+
+        <div class="form-group">
+          <label for="userCreditCard">Credit Card Number</label>
+          <input type="text" id="userCreditCard" value="4532-8921-1049-7832" oninput="updatePiiPreview()" />
+        </div>
+
+        <div class="row-group">
+          <div class="form-group">
+            <label for="userSsn">US SSN / Tax ID</label>
+            <input type="text" id="userSsn" value="123-45-6789" oninput="updatePiiPreview()" />
+          </div>
+          <div class="form-group">
+            <label for="userPan">Indian PAN Card</label>
+            <input type="text" id="userPan" value="ABCDE1234F" oninput="updatePiiPreview()" />
+          </div>
+        </div>
+
+        <label>Live Client Redaction Preview (What cloud receives)</label>
+        <div class="preview-box" id="piiPreviewBox">
+          Scanning input fields for PII...
+        </div>
+      </section>
+
+      <!-- Station 3: Visual Vision ML Inspection Harness (YOLO + PP-OCR) -->
+      <section class="station-card">
+        <div class="station-tag">Station 3 • Vision ML</div>
+        <h3 class="station-title">🎨 Canvas & Visual Inspection</h3>
+        <p class="station-desc">Non-DOM canvas elements and embedded text nodes inspected via backend YOLO UI detector + PP-OCR.</p>
+
+        <label>HTML5 Interactive Canvas Node</label>
+        <canvas id="chartCanvas" width="380" height="130"></canvas>
+
+        <div style="margin-top: 12px; display: flex; gap: 10px;">
+          <button class="btn btn-secondary" onclick="drawCanvasGraph()" style="flex: 1;">Re-render Canvas</button>
+        </div>
+      </section>
+
+      <!-- Station 4: Interruption & CAPTCHA Simulator -->
+      <section class="station-card">
+        <div class="station-tag">Station 4 • Interruptions</div>
+        <h3 class="station-title">🚨 Modals & CAPTCHA Pause/Resume</h3>
+        <p class="station-desc">Tests auto-dismissal of cookie banners and triggers automated CAPTCHA pause in the extension sidepanel.</p>
+
+        <div style="display: flex; gap: 10px;">
+          <button class="btn btn-secondary" onclick="toggleCookieOverlay(true)" style="flex: 1;">Show Cookie Banner</button>
+          <button class="btn btn-amber" onclick="toggleCaptchaWidget(true)" style="flex: 1;">Simulate CAPTCHA</button>
+        </div>
+
+        <!-- CAPTCHA Simulator Challenge Box -->
+        <div class="captcha-frame" id="captchaSimWidget" style="display: none;">
+          <h4>⚠️ reCAPTCHA / Cloudflare Challenge Active</h4>
+          <p style="font-size: 12px; color: #cbd5e1; margin-bottom: 10px;">
+            Extension agent detects this iframe/selector and pauses trajectory execution automatically.
+          </p>
+          <iframe id="recaptchaSimIframe" title="recaptcha challenge simulation" src="about:blank" style="width: 100%; height: 50px; border: none; background: #312e81; border-radius: 6px; margin-bottom: 8px;"></iframe>
+          <button class="btn btn-secondary" onclick="toggleCaptchaWidget(false)">Resolve CAPTCHA & Resume Agent</button>
+        </div>
+      </section>
+
+      <!-- Station 5: Multi-Step Trajectory & Fast Replay Workflow (Full Width) -->
+      <section class="station-card full-width">
+        <div class="station-tag">Station 5 • Multi-Step Workflow</div>
+        <h3 class="station-title">⚡ Multi-Step Wizard & Trajectory Fast Replay</h3>
+        <p class="station-desc">A 3-step wizard workflow. When completed, the agent caches the trajectory key in chrome.storage.local for 0ms instant AI bypass on repeat runs.</p>
+
+        <div class="wizard-steps">
+          <div class="wizard-step active" id="wizTab1">Step 1: Account Info</div>
+          <div class="wizard-step" id="wizTab2">Step 2: Preferences</div>
+          <div class="wizard-step" id="wizTab3">Step 3: Confirmation</div>
+        </div>
+
+        <!-- Step 1 Content -->
+        <div id="wizStep1Content">
+          <div class="row-group">
+            <div class="form-group">
+              <label for="wizFirstName">First Name</label>
+              <input type="text" id="wizFirstName" value="Sarah" />
+            </div>
+            <div class="form-group">
+              <label for="wizLastName">Last Name</label>
+              <input type="text" id="wizLastName" value="Connor" />
+            </div>
+          </div>
+          <button class="btn" id="nextToStep2Btn" onclick="goToWizStep(2)">Proceed to Step 2 →</button>
+        </div>
+
+        <!-- Step 2 Content -->
+        <div id="wizStep2Content" style="display: none;">
+          <div class="form-group">
+            <label for="wizRole">Primary Role</label>
+            <select id="wizRole">
+              <option value="dev">AI Engineer</option>
+              <option value="researcher">Browser Agent Researcher</option>
+              <option value="pm">Product Manager</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="goToWizStep(1)">← Back</button>
+            <button class="btn" id="nextToStep3Btn" onclick="goToWizStep(3)">Proceed to Confirmation →</button>
+          </div>
+        </div>
+
+        <!-- Step 3 Content -->
+        <div id="wizStep3Content" style="display: none;">
+          <p style="font-size: 14px; color: #10b981; margin-bottom: 12px;">
+            ✅ All steps validated! Click submit to complete trajectory.
+          </p>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn btn-secondary" onclick="goToWizStep(2)">← Back</button>
+            <button class="btn" id="finishWizardBtn" onclick="finishWizardTrajectory()">⚡ Complete & Cache Trajectory</button>
+          </div>
+        </div>
+
+        <div class="console-out" id="testConsole">
+          [System Console] Test page initialized. Ready for Atlas & Comet Agent inspection.
+        </div>
+      </section>
+
+    </div>
   </div>
 
   <!-- Cookie Modal Overlay -->
-  <div class="cookie-banner" id="cookieOverlay">
-    <p style="color: white; margin-bottom: 8px;"><strong>We use cookies:</strong> Accept to continue testing.</p>
-    <button id="acceptCookiesBtn" onclick="document.getElementById('cookieOverlay').style.display='none'">Accept Cookies</button>
+  <div class="overlay-box" id="cookieBannerOverlay" style="position: fixed; bottom: 20px; right: 20px; max-width: 380px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
+    <p style="font-size: 13px; color: white; margin-bottom: 10px;">
+      🍪 <strong>Cookie & Privacy Consent:</strong> We use cookies to enhance testing performance.
+    </p>
+    <div style="display: flex; gap: 8px;">
+      <button class="btn" id="acceptAllCookiesBtn" onclick="toggleCookieOverlay(false)" style="font-size: 12px; padding: 6px 12px;">Accept All Cookies</button>
+      <button class="btn btn-secondary" onclick="toggleCookieOverlay(false)" style="font-size: 12px; padding: 6px 12px;">Got It</button>
+    </div>
   </div>
 
   <script>
-    const canvas = document.getElementById('testCanvas');
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = '#6366f1';
-    ctx.fillRect(10, 10, 380, 80);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '16px sans-serif';
-    ctx.fillText('Interactive Canvas Chart Node', 30, 50);
+    // Station 2: PII Redaction Live Preview
+    function updatePiiPreview() {
+      const email = document.getElementById('userEmail').value;
+      const phone = document.getElementById('userPhone').value;
+      const card = document.getElementById('userCreditCard').value;
+      const ssn = document.getElementById('userSsn').value;
+      const pan = document.getElementById('userPan').value;
+
+      let combined = `Email: ${email} | Phone: ${phone} | Card: ${card} | SSN: ${ssn} | PAN: ${pan}`;
+
+      // Simulate client regex redaction
+      combined = combined.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[REDACTED_EMAIL]');
+      combined = combined.replace(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, '[REDACTED_PHONE]');
+      combined = combined.replace(/\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})\b/g, '[REDACTED_CARD]');
+      combined = combined.replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[REDACTED_SSN]');
+      combined = combined.replace(/\b[A-Z]{5}[0-9]{4}[A-Z]{1}\b/g, '[REDACTED_PAN]');
+
+      document.getElementById('piiPreviewBox').innerText = combined;
+    }
+
+    // Station 3: Canvas Graph Renderer
+    function drawCanvasGraph() {
+      const canvas = document.getElementById('chartCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Background
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Accent Graph Line
+      ctx.beginPath();
+      ctx.moveTo(20, 100);
+      ctx.lineTo(80, 60);
+      ctx.lineTo(160, 85);
+      ctx.lineTo(240, 30);
+      ctx.lineTo(340, 45);
+      ctx.strokeStyle = '#6366f1';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Canvas Text Node
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 14px Inter, sans-serif';
+      ctx.fillText('YOLO + PP-OCR Node Target: $84,920', 30, 30);
+    }
+
+    // Station 4: Overlays & CAPTCHA
+    function toggleCookieOverlay(show) {
+      document.getElementById('cookieBannerOverlay').style.display = show ? 'block' : 'none';
+      logConsole(show ? 'Cookie Overlay Rendered' : 'Cookie Banner Dismissed');
+    }
+
+    function toggleCaptchaWidget(show) {
+      document.getElementById('captchaSimWidget').style.display = show ? 'block' : 'none';
+      logConsole(show ? 'CAPTCHA Challenge Widget Activated!' : 'CAPTCHA Challenge Resolved!');
+    }
+
+    // Station 5: Wizard Logic
+    function goToWizStep(step) {
+      document.getElementById('wizStep1Content').style.display = step === 1 ? 'block' : 'none';
+      document.getElementById('wizStep2Content').style.display = step === 2 ? 'block' : 'none';
+      document.getElementById('wizStep3Content').style.display = step === 3 ? 'block' : 'none';
+
+      document.getElementById('wizTab1').className = `wizard-step ${step === 1 ? 'active' : ''}`;
+      document.getElementById('wizTab2').className = `wizard-step ${step === 2 ? 'active' : ''}`;
+      document.getElementById('wizTab3').className = `wizard-step ${step === 3 ? 'active' : ''}`;
+
+      logConsole(`Wizard Navigated to Step ${step}`);
+    }
+
+    function finishWizardTrajectory() {
+      logConsole('⚡ Wizard Trajectory Complete! Trajectory saved to local storage cache.');
+      alert('Wizard completed successfully! Agent trajectory ready for instant replay.');
+    }
+
+    function logConsole(msg) {
+      const consoleEl = document.getElementById('testConsole');
+      const time = new Date().toLocaleTimeString();
+      consoleEl.innerHTML += `<br>[${time}] ${msg}`;
+      consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    // Initialize Page State
+    window.addEventListener('DOMContentLoaded', () => {
+      updatePiiPreview();
+      drawCanvasGraph();
+    });
   </script>
 </body>
 </html>

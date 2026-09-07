@@ -66,7 +66,15 @@ Respond ONLY with valid JSON in this exact structure:
     try {
       const jsonMatch = data.response.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        return JSON.parse(jsonMatch[0]);
+        const parsed = JSON.parse(jsonMatch[0]);
+        const targetRef = parsed.target_ref || parsed.targetRef || parsed.ref;
+        return {
+          thought: parsed.thought || 'Parsed action from local LLM',
+          action: parsed.action || (targetRef ? 'CLICK' : 'FINISH'),
+          ref: targetRef,
+          targetRef: targetRef,
+          value: parsed.value
+        };
       }
     } catch (e) {
       console.error('[Planner] Failed to parse LLM JSON:', data.response);
@@ -84,6 +92,33 @@ Respond ONLY with valid JSON in this exact structure:
         thought: 'Completed maximum trajectory steps',
         action: 'FINISH',
         value: 'Max step limit reached.'
+      };
+    }
+
+    // 0. Dismiss / Cookie / Modal Goal Matching
+    if (goalLower.includes('dismiss') || goalLower.includes('cookie') || goalLower.includes('popup') || goalLower.includes('overlay') || goalLower.includes('banner')) {
+      const dismissBtnNode = axNodes.find((n) => {
+        const nameLower = (n.name || '').toLowerCase();
+        return (n.role === 'button' || n.role === 'link') && 
+          (nameLower.includes('accept') || nameLower.includes('agree') || nameLower.includes('allow') || nameLower.includes('got it') || nameLower.includes('dismiss') || nameLower.includes('close') || nameLower === 'ok');
+      });
+
+      if (dismissBtnNode) {
+        const alreadyClicked = actionHistory.some((a) => a.action === 'CLICK' && a.targetRef === dismissBtnNode.ref);
+        if (!alreadyClicked) {
+          return {
+            thought: `Identified cookie/modal dismiss target [${dismissBtnNode.role}] ${dismissBtnNode.ref} ("${dismissBtnNode.name}")`,
+            action: 'CLICK',
+            ref: dismissBtnNode.ref,
+            targetRef: dismissBtnNode.ref
+          };
+        }
+      }
+
+      return {
+        thought: 'Cookie banners and modal popups auto-dismissed',
+        action: 'FINISH',
+        value: 'Dismissed overlays and cookie banners successfully.'
       };
     }
 

@@ -7,20 +7,22 @@
   <link rel="stylesheet" href="panel.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="app-container">
+
     <!-- Header -->
     <header class="header">
       <div class="brand">
         <div class="logo-icon">✨</div>
         <div>
           <h1 class="app-title">Atlas & Comet</h1>
-          <p class="app-subtitle">Hybrid Local & Cloud Agent</p>
+          <p class="app-subtitle">Autonomous Local & Cloud Agent</p>
         </div>
       </div>
       <div class="badge-group">
+        <div class="status-badge offline" id="backendHealthBadge" title="FastAPI Backend Server Status">ML: OFF</div>
         <div class="route-badge local" id="routingBadge">LOCAL AGENT</div>
         <div class="status-badge" id="agentStatusBadge">IDLE</div>
       </div>
@@ -31,15 +33,16 @@
       <div class="captcha-icon">⚠️</div>
       <div class="captcha-info">
         <span class="captcha-title">CAPTCHA Challenge Detected</span>
-        <span class="captcha-desc">Please solve the CAPTCHA in the main browser window. Automation will auto-resume!</span>
+        <span class="captcha-desc">Automation paused. Solve the CAPTCHA in the active browser tab to resume automatically!</span>
       </div>
     </div>
 
     <!-- Navigation Tabs -->
     <nav class="nav-tabs">
       <button class="nav-btn active" data-tab="tab-control">Control Center</button>
-      <button class="nav-btn" data-tab="tab-ax">AX Ref Tree (@e1)</button>
+      <button class="nav-btn" data-tab="tab-ax">AX Tree (@e1)</button>
       <button class="nav-btn" data-tab="tab-map">Physical Map</button>
+      <button class="nav-btn" data-tab="tab-privscope">PrivScope</button>
       <button class="nav-btn" data-tab="tab-settings">Config & Cache</button>
     </nav>
 
@@ -47,7 +50,10 @@
     <main class="tab-content active" id="tab-control">
       <!-- Task Prompt Input -->
       <section class="card input-card">
-        <label for="taskPrompt" class="card-label">Task Goal & Instructions</label>
+        <div class="card-header">
+          <label for="taskPrompt" class="card-label">Task Goal & Instructions</label>
+          <span class="cache-indicator" id="cacheHitIndicator" style="display: none;">⚡ Fast Replay Ready</span>
+        </div>
         <textarea 
           id="taskPrompt" 
           class="task-textarea" 
@@ -69,9 +75,9 @@
       <section class="card shortcuts-card">
         <label class="card-label">Quick Presets</label>
         <div class="chip-group">
-          <button class="chip" data-preset="Search for 'Local GUI Agents' and submit form">🔎 Search & Submit</button>
-          <button class="chip" data-preset="Fill user email and phone with test values">📝 Fill PrivScope Form</button>
-          <button class="chip" data-preset="Scan Accessibility Tree and list all @e Ref tags">🌐 Scan AX Tree</button>
+          <button class="chip" data-preset="Search for 'Atlas & Comet Agent Architecture' and submit search target">🔎 Search Target</button>
+          <button class="chip" data-preset="Fill user email, phone, and card number with test values">📝 Fill PrivScope Form</button>
+          <button class="chip" data-preset="Complete multi-step wizard trajectory">⚡ Run 3-Step Wizard</button>
           <button class="chip" data-preset="Dismiss cookie popups and overlays">🛡️ Dismiss Banners</button>
         </div>
       </section>
@@ -79,12 +85,12 @@
       <!-- Live Execution Log -->
       <section class="card log-card">
         <div class="card-header">
-          <label class="card-label">Live Trajectory Logs</label>
+          <label class="card-label">Live Trajectory Timeline</label>
           <button id="clearLogsBtn" class="btn-text">Clear</button>
         </div>
         <div class="log-container" id="logContainer">
           <div class="log-entry log-info">
-            <span class="log-time">[System]</span> Ready. Hybrid routing engine & PrivScope active.
+            <span class="log-time">[System]</span> Atlas & Comet Hybrid Agent Ready. PrivScope local encryption active.
           </div>
         </div>
       </section>
@@ -95,30 +101,59 @@
       <section class="card map-card">
         <div class="card-header">
           <label class="card-label">Accessibility Tree Refs Snapshot</label>
-          <button id="scanAxBtn" class="btn-secondary">Refresh Tree</button>
+          <button id="scanAxBtn" class="btn-secondary">Scan Tree</button>
         </div>
-        <p class="card-desc">Stripped semantic nodes tagged with stable Reference IDs (@e1, @e2...)</p>
+        <p class="card-desc">Interactive accessibility nodes tagged with stable Reference IDs (@e1, @e2...)</p>
+        
+        <!-- Filter Search Bar -->
+        <div class="search-box">
+          <input type="text" id="axSearchInput" placeholder="Filter by Ref (@e1), tag, or text..." />
+        </div>
+
         <div class="ax-tree-view" id="axTreeView">
-          <div class="empty-state">Click "Refresh Tree" or launch a task to generate Reference IDs...</div>
+          <div class="empty-state">Click "Scan Tree" or launch a task to populate Reference IDs...</div>
         </div>
       </section>
     </main>
 
-    <!-- Tab 3: Structural Layout Map -->
+    <!-- Tab 3: Structural Physical Layout Map -->
     <main class="tab-content" id="tab-map">
       <section class="card map-card">
         <div class="card-header">
           <label class="card-label">Single JSON Array Physical Map</label>
           <button id="refreshMapBtn" class="btn-secondary">Scan Map</button>
         </div>
-        <pre class="json-viewer" id="jsonViewer"><code>Click "Scan Map" to view physical bounding map...</code></pre>
+        <p class="card-desc">Physical bounding boxes (x, y, w, h) & DOM elements with local PII filter active.</p>
+        <pre class="json-viewer" id="jsonViewer"><code>Click "Scan Map" to view physical bounding screen map...</code></pre>
       </section>
     </main>
 
-    <!-- Tab 4: Config & Trajectory Cache -->
+    <!-- Tab 4: PrivScope Local Binding Table -->
+    <main class="tab-content" id="tab-privscope">
+      <section class="card settings-card">
+        <div class="card-header">
+          <label class="card-label">PrivScope On-Device Binding Table</label>
+          <button id="refreshPrivScopeBtn" class="btn-secondary">Refresh Table</button>
+        </div>
+        <p class="card-desc">Sensitive credentials bound locally on-device. Cloud models receive $BIND_* tokens.</p>
+        
+        <div class="privscope-view" id="privscopeView">
+          <div class="binding-item">
+            <span class="bind-key">$BIND_EMAIL_ADDR_0</span>
+            <span class="bind-value">[ON_DEVICE_PROTECTED]</span>
+          </div>
+          <div class="binding-item">
+            <span class="bind-key">$BIND_CARD_NUM_1</span>
+            <span class="bind-value">[ON_DEVICE_PROTECTED]</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Tab 5: Config & Trajectory Cache Manager -->
     <main class="tab-content" id="tab-settings">
       <section class="card settings-card">
-        <label class="card-label">Engine & Cache Settings</label>
+        <label class="card-label">Engine & Security Settings</label>
         
         <div class="setting-item">
           <div class="setting-info">
@@ -153,7 +188,18 @@
           </label>
         </div>
 
-        <div style="margin-top: 10px;">
+        <!-- Trajectory Cache Browser -->
+        <div style="margin-top: 18px;">
+          <div class="card-header">
+            <label class="card-label">Cached Trajectories</label>
+            <button id="refreshCacheListBtn" class="btn-text">Refresh List</button>
+          </div>
+          <div class="cache-list" id="cacheList">
+            <div class="empty-state">No cached trajectories found.</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 14px;">
           <button id="clearCacheBtn" class="btn btn-secondary" style="width: 100%;">⚡ Clear All Cached Trajectories</button>
         </div>
       </section>
@@ -164,7 +210,7 @@
       <div class="footer-item">
         <span class="indicator active"></span> PrivScope & AXTree Active
       </div>
-      <div class="footer-item">v1.1.0 Hybrid</div>
+      <div class="footer-item">v1.2.0 Hybrid</div>
     </footer>
   </div>
 

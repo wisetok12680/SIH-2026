@@ -1,6 +1,6 @@
 /**
  * Sidepanel Interface Script - Hybrid Control Center
- * Manages tabs, task controls, Accessibility Ref Tree (@e1, @e2...), Routing badges, and CAPTCHA alert banners.
+ * Manages tabs, task controls, Accessibility Ref Tree (@e1, @e2...), Routing badges, PrivScope, and Trajectory Cache.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -13,19 +13,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearLogsBtn = document.getElementById('clearLogsBtn');
   const statusBadge = document.getElementById('agentStatusBadge');
   const routingBadge = document.getElementById('routingBadge');
+  const backendHealthBadge = document.getElementById('backendHealthBadge');
   const captchaBanner = document.getElementById('captchaBanner');
   const jsonViewer = document.getElementById('jsonViewer');
   const refreshMapBtn = document.getElementById('refreshMapBtn');
   const scanAxBtn = document.getElementById('scanAxBtn');
   const axTreeView = document.getElementById('axTreeView');
+  const axSearchInput = document.getElementById('axSearchInput');
   const chips = document.querySelectorAll('.chip');
 
   const toggleTrajectoryCache = document.getElementById('toggleTrajectoryCache');
   const togglePrivScope = document.getElementById('togglePrivScope');
   const toggleAutoModals = document.getElementById('toggleAutoModals');
   const clearCacheBtn = document.getElementById('clearCacheBtn');
+  const refreshCacheListBtn = document.getElementById('refreshCacheListBtn');
+  const cacheList = document.getElementById('cacheList');
+  const refreshPrivScopeBtn = document.getElementById('refreshPrivScopeBtn');
+  const privscopeView = document.getElementById('privscopeView');
 
-  // 1. Tab Switching Logic
+  let currentAxNodes = [];
+
+  // 1. Backend Health Check Loop
+  checkBackendHealth();
+  setInterval(checkBackendHealth, 10000);
+
+  async function checkBackendHealth() {
+    try {
+      const res = await fetch('http://localhost:8000/health');
+      if (res.ok) {
+        backendHealthBadge.innerText = 'ML: ON';
+        backendHealthBadge.className = 'status-badge online';
+      } else {
+        throw new Error();
+      }
+    } catch (e) {
+      backendHealthBadge.innerText = 'ML: OFF';
+      backendHealthBadge.className = 'status-badge offline';
+    }
+  }
+
+  // 2. Tab Switching Logic
   navButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
@@ -35,17 +62,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       btn.classList.add('active');
       document.getElementById(targetTab).classList.add('active');
+
+      if (targetTab === 'tab-settings') loadCacheList();
+      if (targetTab === 'tab-privscope') loadPrivScopeBindings();
     });
   });
 
-  // 2. Preset Chips
+  // 3. Preset Chips
   chips.forEach((chip) => {
     chip.addEventListener('click', () => {
       taskPrompt.value = chip.getAttribute('data-preset');
     });
   });
 
-  // 3. Start Agent Task
+  // 4. Start Agent Task
   startBtn.addEventListener('click', async () => {
     const taskText = taskPrompt.value.trim();
     if (!taskText) {
@@ -77,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
     );
   });
 
-  // 4. Stop Agent Task
+  // 5. Stop Agent Task
   stopBtn.addEventListener('click', () => {
     chrome.runtime.sendMessage({ type: 'STOP_AGENT_TASK' }, (response) => {
       addLogEntry('WARN', 'Task stopped by user.');
@@ -86,30 +116,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 5. Clear Logs & Clear Cache
+  // 6. Clear Logs & Clear Cache
   clearLogsBtn.addEventListener('click', () => {
-    logContainer.innerHTML = '<div class="log-entry log-info"><span class="log-time">[System]</span> Logs cleared.</div>';
+    logContainer.innerHTML = '<div class="log-entry log-info"><span class="log-time">[System]</span> Logs cleared. Ready for next trajectory.</div>';
   });
 
   clearCacheBtn.addEventListener('click', () => {
     chrome.runtime.sendMessage({ type: 'CLEAR_TRAJECTORY_CACHE' }, (response) => {
       addLogEntry('SUCCESS', '⚡ Cleared all cached trajectories.');
+      loadCacheList();
     });
   });
 
-  // 6. Manual AX Tree Scan
-  scanAxBtn.addEventListener('click', () => {
+  if (refreshCacheListBtn) {
+    refreshCacheListBtn.addEventListener('click', loadCacheList);
+  }
+
+  if (refreshPrivScopeBtn) {
+    refreshPrivScopeBtn.addEventListener('click', loadPrivScopeBindings);
+  }
+
+  // 7. Manual AX Tree Scan & Search Filter
+  scanAxBtn.addEventListener('click', scanAxTree);
+
+  if (axSearchInput) {
+    axSearchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      if (!query) {
+        renderAxTree(currentAxNodes);
+        return;
+      }
+
+      const filtered = currentAxNodes.filter((n) => {
+        const refMatch = (n.ref || '').toLowerCase().includes(query);
+        const roleMatch = (n.role || '').toLowerCase().includes(query);
+        const nameMatch = (n.name || '').toLowerCase().includes(query);
+        const tagMatch = (n.tagName || '').toLowerCase().includes(query);
+        return refMatch || roleMatch || nameMatch || tagMatch;
+      });
+
+      renderAxTree(filtered);
+    });
+  }
+
+  function scanAxTree() {
     axTreeView.innerHTML = '<div class="empty-state">Scanning Accessibility Tree...</div>';
     chrome.runtime.sendMessage({ type: 'GET_CURRENT_LAYOUT' }, (response) => {
       if (response && response.status === 'SUCCESS' && response.data?.axTree) {
-        renderAxTree(response.data.axTree.nodes);
+        currentAxNodes = response.data.axTree.nodes || [];
+        renderAxTree(currentAxNodes);
       } else {
         axTreeView.innerHTML = `<div class="empty-state">Error scanning AX Tree: ${response?.error || 'Active tab unavailable'}</div>`;
       }
     });
-  });
+  }
 
-  // 7. Manual Physical Map Scan
+  // 8. Manual Physical Map Scan
   refreshMapBtn.addEventListener('click', () => {
     jsonViewer.innerText = 'Scanning physical screen layout...';
     chrome.runtime.sendMessage({ type: 'GET_CURRENT_LAYOUT' }, (response) => {
@@ -121,7 +183,62 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 8. Background Event Listener
+  // 9. Load Trajectory Cache Items
+  async function loadCacheList() {
+    if (!cacheList) return;
+    cacheList.innerHTML = '<div class="empty-state">Loading cached trajectories...</div>';
+
+    chrome.storage.local.get(null, (allStorage) => {
+      const trajKeys = Object.keys(allStorage).filter((k) => k.startsWith('traj_'));
+
+      if (trajKeys.length === 0) {
+        cacheList.innerHTML = '<div class="empty-state">No cached trajectories found in local storage.</div>';
+        return;
+      }
+
+      cacheList.innerHTML = trajKeys.map((key) => {
+        const item = allStorage[key];
+        const stepCount = item.steps ? item.steps.length : 0;
+        return `
+          <div class="cache-item">
+            <div>
+              <span class="cache-domain">${escapeHtml(item.domain || 'Global')}</span>
+              <div class="cache-task">"${escapeHtml(item.task || 'Task')}" (${stepCount} steps)</div>
+            </div>
+            <button class="btn btn-secondary btn-delete-key" data-key="${key}">Delete</button>
+          </div>
+        `;
+      }).join('');
+
+      document.querySelectorAll('.btn-delete-key').forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          const k = e.target.getAttribute('data-key');
+          chrome.storage.local.remove([k], () => loadCacheList());
+        });
+      });
+    });
+  }
+
+  // 10. Load PrivScope Binding Table Inspector
+  function loadPrivScopeBindings() {
+    if (!privscopeView) return;
+    privscopeView.innerHTML = `
+      <div class="binding-item">
+        <span class="bind-key">$BIND_EMAIL_ADDR_0</span>
+        <span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span>
+      </div>
+      <div class="binding-item">
+        <span class="bind-key">$BIND_CARD_NUM_1</span>
+        <span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span>
+      </div>
+      <div class="binding-item">
+        <span class="bind-key">$BIND_SSN_ID_2</span>
+        <span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span>
+      </div>
+    `;
+  }
+
+  // 11. Background Event Listener
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'AGENT_LOG_UPDATE') {
       const { phase, message: text, routingMode, cacheHit, timestamp } = message.payload;
@@ -146,14 +263,15 @@ document.addEventListener('DOMContentLoaded', () => {
     } else if (message.type === 'AGENT_LAYOUT_PREVIEW') {
       jsonViewer.innerText = JSON.stringify(message.payload, null, 2);
       if (message.payload?.axTree?.nodes) {
-        renderAxTree(message.payload.axTree.nodes);
+        currentAxNodes = message.payload.axTree.nodes;
+        renderAxTree(currentAxNodes);
       }
     }
   });
 
   function renderAxTree(nodes) {
     if (!nodes || nodes.length === 0) {
-      axTreeView.innerHTML = '<div class="empty-state">No interactive accessibility nodes found on active screen.</div>';
+      axTreeView.innerHTML = '<div class="empty-state">No interactive accessibility nodes found matching criteria.</div>';
       return;
     }
 
@@ -161,7 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="ax-node">
         <span class="ref-tag">${n.ref}</span>
         <span class="node-role">[${escapeHtml(n.role)}]</span>
-        <span class="node-name">${escapeHtml(n.name || n.value || '<unnamed>')}</span>
+        <span class="node-name" title="${escapeHtml(n.name)}">${escapeHtml(n.name || n.value || '<unnamed>')}</span>
       </div>
     `).join('');
   }
