@@ -20,7 +20,7 @@ export class AgentPlannerClient {
   }
 
   async planNextStep(userGoal, layoutData, actionHistory = [], options = {}) {
-    const { useLocalLlm = false, serverUrl } = options;
+    const { useLocalLlm = true, serverUrl } = options;
 
     if (useLocalLlm) {
       // 1. Try Local Ollama Model on port 11434 with fast connection check
@@ -28,7 +28,7 @@ export class AgentPlannerClient {
         const llmResult = await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || this.apiUrl);
         if (llmResult && llmResult.action) return llmResult;
       } catch (err) {
-        console.warn('[Planner] Ollama LLM connection check timed out/offline. Checking FastAPI...');
+        console.warn('[Planner] Ollama LLM connection check timed out/offline. Checking FastAPI...', err.message);
       }
 
       // 2. Try FastAPI Reasoning AI Server on port 8000 with fast connection check
@@ -105,15 +105,18 @@ Respond ONLY with valid JSON in this exact structure:
   "value": "text value if typing or direction if scrolling"
 }`;
 
+    const targetModel = this.model || 'qwen:4b';
+    console.log(`[Planner] Calling local Ollama LLM endpoint '${endpoint}' with model '${targetModel}'...`);
+
     const res = await fetchWithTimeout(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: this.model,
+        model: targetModel,
         prompt: prompt,
         stream: false
       })
-    }, 1200);
+    }, 4000);
 
     if (!res.ok) throw new Error(`LLM API returned status ${res.status}`);
     const data = await res.json();
@@ -124,7 +127,7 @@ Respond ONLY with valid JSON in this exact structure:
         const parsed = JSON.parse(jsonMatch[0]);
         const targetRef = parsed.target_ref || parsed.targetRef || parsed.ref;
         return {
-          thought: parsed.thought || 'Parsed action from local LLM',
+          thought: `[Local Qwen LLM] ${parsed.thought || 'Parsed action from local Qwen model'}`,
           action: parsed.action || (targetRef ? 'CLICK' : 'FINISH'),
           ref: targetRef,
           targetRef: targetRef,

@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         task: taskText,
         settings: {
           enablePiiFilter: togglePrivScope.checked,
+          useLocalLlm: toggleLocalLlm.checked,
           autoDismissModals: toggleAutoModals.checked,
           enableTrajectoryCache: toggleTrajectoryCache.checked
         }
