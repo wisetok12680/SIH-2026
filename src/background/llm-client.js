@@ -14,7 +14,7 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 800) {
 }
 
 export class AgentPlannerClient {
-  constructor(apiUrl = 'http://localhost:11434/api/generate', model = 'llama3') {
+  constructor(apiUrl = 'http://localhost:11434/api/generate', model = 'qwen:4b') {
     this.apiUrl = apiUrl;
     this.model = model;
   }
