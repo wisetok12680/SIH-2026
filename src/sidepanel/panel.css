@@ -157,38 +157,70 @@ body {
 .captcha-title { font-size: 12px; font-weight: 700; color: #fb7185; }
 .captcha-desc { font-size: 11px; color: #fecdd3; }
 
-/* Navigation Tabs */
-.nav-tabs {
+/* Workspace Layout with Vertical Side Navigation */
+.workspace-layout {
   display: flex;
-  background: #0f172a;
-  border-bottom: 1px solid var(--card-border);
-  overflow-x: auto;
+  flex: 1;
+  overflow: hidden;
+}
+
+.side-nav {
+  display: flex;
+  flex-direction: column;
+  width: 66px;
+  background: rgba(15, 23, 42, 0.95);
+  border-right: 1px solid var(--card-border);
+  padding: 10px 4px;
+  gap: 6px;
+  backdrop-filter: blur(8px);
 }
 
 .nav-btn {
-  flex: 1;
-  min-width: fit-content;
-  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 4px;
   background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: all 0.2s ease-in-out;
+}
+
+.nav-icon {
+  font-size: 16px;
+}
+
+.nav-label {
+  font-size: 10px;
+  letter-spacing: -0.2px;
 }
 
 .nav-btn:hover {
   color: #ffffff;
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .nav-btn.active {
   color: #818cf8;
-  border-bottom-color: #6366f1;
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+.main-content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg-dark);
 }
 
 /* Main Tab Content */
@@ -254,9 +286,20 @@ body {
   border-color: var(--primary);
 }
 
-.button-group {
+/* Equal Width Floating Action Buttons */
+.button-group-floating {
   display: flex;
-  gap: 8px;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn-equal {
+  flex: 1;
+  width: 50%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.3px;
 }
 
 .btn {
@@ -276,21 +319,21 @@ body {
 .btn-primary {
   background: var(--primary);
   color: #ffffff;
-  flex: 2;
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--primary-hover);
+  box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
 }
 
 .btn-danger {
   background: #dc2626;
   color: #ffffff;
-  flex: 1;
 }
 
 .btn-danger:hover:not(:disabled) {
   background: #b91c1c;
+  box-shadow: 0 6px 16px rgba(220, 38, 38, 0.4);
 }
 
 .btn-secondary {
