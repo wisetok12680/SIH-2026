@@ -14,9 +14,34 @@ async function fetchWithTimeout(url, options = {}, timeoutMs = 800) {
 }
 
 export class AgentPlannerClient {
-  constructor(apiUrl = 'http://localhost:11434/api/generate', model = 'qwen:4b') {
+  constructor(apiUrl = 'http://localhost:11434/api/generate', model = 'qwen3:4b') {
     this.apiUrl = apiUrl;
     this.model = model;
+    this.detectedModel = null;
+  }
+
+  async getActiveModel(baseUrl = 'http://localhost:11434') {
+    if (this.detectedModel) return this.detectedModel;
+    try {
+      const res = await fetchWithTimeout(`${baseUrl}/api/tags`, {}, 800);
+      if (res.ok) {
+        const data = await res.json();
+        const models = (data.models || []).map((m) => m.name || m.model || '');
+        const qwenMatch = models.find((m) => /qwen3/i.test(m)) || models.find((m) => /qwen/i.test(m));
+        if (qwenMatch) {
+          console.log(`[Planner] Auto-detected active Ollama Qwen model tag: '${qwenMatch}'`);
+          this.detectedModel = qwenMatch;
+          return qwenMatch;
+        }
+        if (models.length > 0) {
+          this.detectedModel = models[0];
+          return models[0];
+        }
+      }
+    } catch (e) {
+      console.warn('[Planner] Could not query Ollama /api/tags:', e.message);
+    }
+    return this.model || 'qwen3:4b';
   }
 
   async planNextStep(userGoal, layoutData, actionHistory = [], options = {}) {
@@ -105,18 +130,18 @@ Respond ONLY with valid JSON in this exact structure:
   "value": "text value if typing or direction if scrolling"
 }`;
 
-    const targetModel = this.model || 'qwen:4b';
-    console.log(`[Planner] Calling local Ollama LLM endpoint '${endpoint}' with model '${targetModel}'...`);
+    const activeModel = await this.getActiveModel('http://localhost:11434');
+    console.log(`[Planner] Calling local Ollama LLM endpoint '${endpoint}' with model '${activeModel}'...`);
 
     const res = await fetchWithTimeout(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: targetModel,
+        model: activeModel,
         prompt: prompt,
         stream: false
       })
-    }, 4000);
+    }, 6000);
 
     if (!res.ok) throw new Error(`LLM API returned status ${res.status}`);
     const data = await res.json();
