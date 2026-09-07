@@ -22,9 +22,9 @@ let agentState = {
   cacheHit: false,
   settings: {
     enablePiiFilter: true,
-    useLocalLlm: false,
+    useLocalLlm: true,
     autoDismissModals: true,
-    enableTrajectoryCache: true
+    enableTrajectoryCache: false
   }
 };
 

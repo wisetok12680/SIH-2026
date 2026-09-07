@@ -141,7 +141,7 @@ Respond ONLY with valid JSON in this exact structure:
         prompt: prompt,
         stream: false
       })
-    }, 6000);
+    }, 25000);
 
     if (!res.ok) throw new Error(`LLM API returned status ${res.status}`);
     const data = await res.json();
