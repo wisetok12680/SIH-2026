@@ -112,12 +112,12 @@
 
     .subpage-btn {
       flex: 1;
-      padding: 10px 16px;
+      padding: 10px 14px;
       background: transparent;
       border: none;
       color: var(--text-muted);
       font-family: var(--font-sans);
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       border-radius: 8px;
       cursor: pointer;
@@ -126,7 +126,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
     }
 
     .subpage-btn:hover {
@@ -333,19 +333,22 @@
     <!-- Sub-Page Navigation Bar -->
     <nav class="subpage-nav">
       <button class="subpage-btn active" id="btn-subpage-1" onclick="switchSubpage(1)">
-        <span>🎯</span> Sub-Page 1: AX Tree Layout
+        <span>🎯</span> 1. AX Tree Layout
       </button>
       <button class="subpage-btn" id="btn-subpage-2" onclick="switchSubpage(2)">
-        <span>🛡️</span> Sub-Page 2: Privacy & PII
+        <span>🛡️</span> 2. Privacy & PII
       </button>
       <button class="subpage-btn" id="btn-subpage-3" onclick="switchSubpage(3)">
-        <span>📊</span> Sub-Page 3: Visual ML & Canvas
+        <span>📊</span> 3. Visual ML Canvas
       </button>
       <button class="subpage-btn" id="btn-subpage-4" onclick="switchSubpage(4)">
-        <span>🍪</span> Sub-Page 4: Interrupts & CAPTCHA
+        <span>🍪</span> 4. Interrupts & CAPTCHA
       </button>
       <button class="subpage-btn" id="btn-subpage-5" onclick="switchSubpage(5)">
-        <span>⚡</span> Sub-Page 5: Trajectory Wizard
+        <span>⚡</span> 5. Trajectory Wizard
+      </button>
+      <button class="subpage-btn" id="btn-subpage-6" onclick="switchSubpage(6)">
+        <span>📄</span> 6. Agentic Job Application
       </button>
     </nav>
 
@@ -570,6 +573,64 @@
       </div>
     </div>
 
+    <!-- SUB-PAGE 6: Agentic Job Application Form -->
+    <div class="subpage-view" id="subpage-6">
+      <div class="station-card">
+        <div class="station-header">
+          <div class="station-icon">📄</div>
+          <div>
+            <div class="station-title">Sub-Page 6: Agentic Job Application Form</div>
+            <div class="station-desc">Automated candidate application form filling. Type "Fill job application form" in sidepanel!</div>
+          </div>
+        </div>
+
+        <form id="jobAppForm" onsubmit="event.preventDefault(); submitJobApplication();" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <div class="form-group">
+              <label for="jobFullName" class="form-label">Full Name</label>
+              <input type="text" id="jobFullName" class="form-input" placeholder="e.g. Alexander Vance" />
+            </div>
+            <div class="form-group">
+              <label for="jobEmail" class="form-label">Email Address</label>
+              <input type="email" id="jobEmail" class="form-input" placeholder="e.g. alex.vance@privacy.org" />
+            </div>
+            <div class="form-group">
+              <label for="jobPhone" class="form-label">Phone Number</label>
+              <input type="text" id="jobPhone" class="form-input" placeholder="e.g. +1 (555) 892-1243" />
+            </div>
+          </div>
+
+          <div>
+            <div class="form-group">
+              <label for="jobExperience" class="form-label">Years of Experience</label>
+              <input type="text" id="jobExperience" class="form-input" placeholder="e.g. 5" />
+            </div>
+            <div class="form-group">
+              <label for="jobPortfolio" class="form-label">GitHub / Portfolio URL</label>
+              <input type="text" id="jobPortfolio" class="form-input" placeholder="e.g. https://github.com/wisetok12680" />
+            </div>
+            <div class="form-group">
+              <label for="jobCoverLetter" class="form-label">Cover Letter Summary</label>
+              <textarea id="jobCoverLetter" class="form-input" rows="2" placeholder="Tell us about your background..."></textarea>
+            </div>
+          </div>
+
+          <div style="grid-column: span 2; display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
+            <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+              <input type="checkbox" id="jobPrivacyCheck" /> I agree to data privacy terms & PrivScope local encryption.
+            </label>
+            <button type="submit" class="btn" id="submitJobAppBtn" style="background: #10b981;">
+              📄 Submit Application
+            </button>
+          </div>
+        </form>
+
+        <div class="console-out" id="console-subpage-6">
+          [System] Sub-Page 6 active. Ready for autonomous agent job application filling.
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Cookie Modal Overlay -->
@@ -681,6 +742,14 @@
 
     function finishWizardTrajectory() {
       logConsole('⚡ Wizard Trajectory Completed & Cached locally!');
+    }
+
+    // Sub-Page 6: Job Application Submission
+    function submitJobApplication() {
+      const name = document.getElementById('jobFullName')?.value || 'Alexander Vance';
+      const role = document.getElementById('jobExperience')?.value || '5 years';
+      logConsole(`✅ JOB APPLICATION SUBMITTED SUCCESSFULLY! Candidate: ${name} (${role} experience)`);
+      alert(`🎉 Application Submitted Successfully!\nCandidate: ${name}\nStatus: Processed Agentically by Atlas & Comet!`);
     }
 
     // Initialize

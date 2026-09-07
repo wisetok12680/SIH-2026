@@ -122,7 +122,59 @@ Respond ONLY with valid JSON in this exact structure:
       };
     }
 
-    // 1. Target Text Input / Search
+    // 1. Job / Form Application Multi-Field Auto-Fill
+    if (goalLower.includes('job') || goalLower.includes('apply') || goalLower.includes('application') || goalLower.includes('form')) {
+      const untypedInputs = axNodes.filter((n) => 
+        (n.role === 'textbox' || n.role === 'searchbox' || n.tagName === 'input' || n.tagName === 'textarea') &&
+        !actionHistory.some((a) => a.action === 'TYPE' && a.targetRef === n.ref)
+      );
+
+      if (untypedInputs.length > 0) {
+        const targetInput = untypedInputs[0];
+        const nameLower = (targetInput.name || targetInput.type || targetInput.ref || '').toLowerCase();
+
+        let fillVal = 'Alexander Vance';
+        if (nameLower.includes('email')) fillVal = 'alex.vance@privacy.org';
+        else if (nameLower.includes('phone')) fillVal = '+1 (555) 892-1243';
+        else if (nameLower.includes('experience') || nameLower.includes('years')) fillVal = '5';
+        else if (nameLower.includes('portfolio') || nameLower.includes('github') || nameLower.includes('link')) fillVal = 'https://github.com/wisetok12680';
+        else if (nameLower.includes('cover') || nameLower.includes('letter') || nameLower.includes('about')) fillVal = 'Experienced AI Systems Engineer specializing in local privacy-preserving browser automation.';
+
+        return {
+          thought: `Autonomously filling job application field '${targetInput.name || targetInput.ref}'`,
+          action: 'TYPE',
+          ref: targetInput.ref,
+          targetRef: targetInput.ref,
+          value: fillVal
+        };
+      }
+
+      // Check unclicked submit button
+      const submitBtn = axNodes.find((n) => {
+        const nameLower = (n.name || '').toLowerCase();
+        return (n.role === 'button' || n.role === 'link') && (nameLower.includes('submit') || nameLower.includes('apply') || nameLower.includes('send'));
+      });
+
+      if (submitBtn) {
+        const alreadyClicked = actionHistory.some((a) => a.action === 'CLICK' && a.targetRef === submitBtn.ref);
+        if (!alreadyClicked) {
+          return {
+            thought: `Submitting completed job application form via button '${submitBtn.name || submitBtn.ref}'`,
+            action: 'CLICK',
+            ref: submitBtn.ref,
+            targetRef: submitBtn.ref
+          };
+        }
+      }
+
+      return {
+        thought: 'Job application form completed and submitted successfully.',
+        action: 'FINISH',
+        value: 'Form submission complete.'
+      };
+    }
+
+    // 2. Target Text Input / Search
     if (goalLower.includes('search') || goalLower.includes('find') || goalLower.includes('fill') || goalLower.includes('type')) {
       const targetInput = axNodes.find((n) => n.role === 'textbox' || n.role === 'searchbox' || n.tagName === 'input');
       const alreadyTyped = actionHistory.some((a) => a.action === 'TYPE' && a.targetRef === targetInput?.ref);
