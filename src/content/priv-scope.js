@@ -36,6 +36,18 @@ class PrivScopeEngine {
     // Detect Phone Numbers
     sanitized = sanitized.replace(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, (match) => this.bindValue(match, 'PHONE_NUM'));
 
+    // Detect Tax IDs & GSTIN
+    sanitized = sanitized.replace(/\b\d{2}[A-Z]{5}\d{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}\b/g, (match) => this.bindValue(match, 'TAX_ID'));
+
+    // Detect Secret API Tokens / Keys
+    sanitized = sanitized.replace(/\b(eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}|sk_live_[0-9a-zA-Z]{24}|ghp_[0-9a-zA-Z]{36}|AKIA[0-9A-Z]{16})\b/g, (match) => this.bindValue(match, 'SECRET_KEY'));
+
+    // Detect Passport Numbers
+    sanitized = sanitized.replace(/\b[A-PR-WYa-pr-wy][0-9]{7}\b/g, (match) => this.bindValue(match, 'PASSPORT_NUM'));
+
+    // Detect Medical Notes & Diagnoses
+    sanitized = sanitized.replace(/\b(?:ICD-[0-9]{2}|RX-[0-9]{6,}|Diagnosis:\s*[^;\n\r,]+)\b/gi, (match) => this.bindValue(match, 'MEDICAL_NOTE'));
+
     return sanitized;
   }
 
