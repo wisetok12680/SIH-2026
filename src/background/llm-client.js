@@ -1,3 +1,5 @@
+import { localMlEngine } from './onnx-local-engine.js';
+
 async function fetchWithTimeout(url, options = {}, timeoutMs = 800) {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -140,9 +142,13 @@ Respond ONLY with valid JSON in this exact structure:
     const goalLower = userGoal.toLowerCase();
     const axNodes = layoutData.axTree?.nodes || [];
 
+    // Run In-Browser WebGPU/ONNX Local ML Intent Engine
+    const intentResult = localMlEngine.classifyIntent(userGoal);
+    const scoredElements = localMlEngine.scoreElements(axNodes, userGoal);
+
     if (actionHistory.length >= 8) {
       return {
-        thought: 'Completed maximum trajectory steps',
+        thought: `Completed maximum trajectory steps (Local Intent: ${intentResult.intent})`,
         action: 'FINISH',
         value: 'Max step limit reached.'
       };
