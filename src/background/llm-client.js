@@ -10,18 +10,63 @@ export class AgentPlannerClient {
   }
 
   async planNextStep(userGoal, layoutData, actionHistory = [], options = {}) {
-    const { useLocalLlm = false, serverUrl } = options;
+    const { serverUrl } = options;
 
-    if (useLocalLlm) {
-      try {
-        return await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || this.apiUrl);
-      } catch (err) {
-        console.warn('[Planner] Local LLM unreachable, using local heuristic Ref engine:', err.message);
-      }
+    // 1. Try Local Ollama Model (e.g., Qwen2.5-0.5B / Llama 3) on port 11434
+    try {
+      const llmResult = await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || this.apiUrl);
+      console.log('[Planner] Action successfully planned by Local Ollama Model:', llmResult);
+      return llmResult;
+    } catch (err) {
+      console.warn('[Planner] Ollama LLM offline, attempting FastAPI Reasoning Server (port 8000):', err.message);
     }
 
-    // Heuristic Ref-based Decision Engine
+    // 2. Try FastAPI Reasoning AI Server (POST http://localhost:8000/reason)
+    try {
+      const apiResult = await this.callFastApiReasoningServer(userGoal, layoutData, actionHistory);
+      console.log('[Planner] Action successfully planned by FastAPI AI Reasoning Server:', apiResult);
+      return apiResult;
+    } catch (err) {
+      console.warn('[Planner] FastAPI AI server offline, falling back to on-device Ref engine:', err.message);
+    }
+
+    // 3. Fallback On-Device Ref Decision Engine
     return this.runHeuristicRefPlanner(userGoal, layoutData, actionHistory);
+  }
+
+  async callFastApiReasoningServer(userGoal, layoutData, actionHistory) {
+    const axNodes = layoutData.axTree?.nodes || [];
+    const elements = axNodes.map((n) => ({
+      ref: n.ref,
+      role: n.role,
+      name: n.name,
+      tagName: n.tagName,
+      disabled: n.disabled
+    }));
+
+    const res = await fetch('http://localhost:8000/reason', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        prompt: userGoal,
+        page_info: {
+          title: layoutData.title || '',
+          url: layoutData.url || '',
+          elements: elements
+        },
+        history: actionHistory
+      })
+    });
+
+    if (!res.ok) throw new Error(`FastAPI Server returned status ${res.status}`);
+    const data = await res.json();
+    return {
+      thought: data.thought || 'Action planned by Cloud AI Reasoning Server',
+      action: data.action || 'FINISH',
+      ref: data.target_ref,
+      targetRef: data.target_ref,
+      value: data.value
+    };
   }
 
   async callLocalLlm(userGoal, layoutData, actionHistory, endpoint) {
