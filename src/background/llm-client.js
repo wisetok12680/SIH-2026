@@ -1,7 +1,15 @@
-/**
- * Local Agent Planner Engine & Heuristic Rules
- * Analyzes Accessibility Tree snapshots (@e1, @e2...) and outputs Ref-based JSON action commands.
- */
+async function fetchWithTimeout(url, options = {}, timeoutMs = 800) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const res = await fetch(url, { ...options, signal: controller.signal });
+    clearTimeout(timer);
+    return res;
+  } catch (err) {
+    clearTimeout(timer);
+    throw err;
+  }
+}
 
 export class AgentPlannerClient {
   constructor(apiUrl = 'http://localhost:11434/api/generate', model = 'llama3') {
@@ -10,27 +18,27 @@ export class AgentPlannerClient {
   }
 
   async planNextStep(userGoal, layoutData, actionHistory = [], options = {}) {
-    const { serverUrl } = options;
+    const { useLocalLlm = false, serverUrl } = options;
 
-    // 1. Try Local Ollama Model (e.g., Qwen2.5-0.5B / Llama 3) on port 11434
-    try {
-      const llmResult = await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || this.apiUrl);
-      console.log('[Planner] Action successfully planned by Local Ollama Model:', llmResult);
-      return llmResult;
-    } catch (err) {
-      console.warn('[Planner] Ollama LLM offline, attempting FastAPI Reasoning Server (port 8000):', err.message);
+    if (useLocalLlm) {
+      // 1. Try Local Ollama Model on port 11434 with fast connection check
+      try {
+        const llmResult = await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || this.apiUrl);
+        if (llmResult && llmResult.action) return llmResult;
+      } catch (err) {
+        console.warn('[Planner] Ollama LLM connection check timed out/offline. Checking FastAPI...');
+      }
+
+      // 2. Try FastAPI Reasoning AI Server on port 8000 with fast connection check
+      try {
+        const apiResult = await this.callFastApiReasoningServer(userGoal, layoutData, actionHistory);
+        if (apiResult && apiResult.action) return apiResult;
+      } catch (err) {
+        console.warn('[Planner] FastAPI AI reasoning server offline. Using fast Ref decision engine...');
+      }
     }
 
-    // 2. Try FastAPI Reasoning AI Server (POST http://localhost:8000/reason)
-    try {
-      const apiResult = await this.callFastApiReasoningServer(userGoal, layoutData, actionHistory);
-      console.log('[Planner] Action successfully planned by FastAPI AI Reasoning Server:', apiResult);
-      return apiResult;
-    } catch (err) {
-      console.warn('[Planner] FastAPI AI server offline, falling back to on-device Ref engine:', err.message);
-    }
-
-    // 3. Fallback On-Device Ref Decision Engine
+    // 3. Fast On-Device Ref Decision Engine (Instant 0ms, 100% reliable)
     return this.runHeuristicRefPlanner(userGoal, layoutData, actionHistory);
   }
 
@@ -44,7 +52,7 @@ export class AgentPlannerClient {
       disabled: n.disabled
     }));
 
-    const res = await fetch('http://localhost:8000/reason', {
+    const res = await fetchWithTimeout('http://localhost:8000/reason', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -56,7 +64,7 @@ export class AgentPlannerClient {
         },
         history: actionHistory
       })
-    });
+    }, 1000);
 
     if (!res.ok) throw new Error(`FastAPI Server returned status ${res.status}`);
     const data = await res.json();
@@ -95,7 +103,7 @@ Respond ONLY with valid JSON in this exact structure:
   "value": "text value if typing or direction if scrolling"
 }`;
 
-    const res = await fetch(endpoint, {
+    const res = await fetchWithTimeout(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -103,7 +111,7 @@ Respond ONLY with valid JSON in this exact structure:
         prompt: prompt,
         stream: false
       })
-    });
+    }, 1200);
 
     if (!res.ok) throw new Error(`LLM API returned status ${res.status}`);
     const data = await res.json();
