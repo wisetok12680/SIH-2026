@@ -233,6 +233,105 @@ async def generate_agent_plan(req: PlanRequest):
         "action": "FINISH"
     }
 
+class Element(BaseModel):
+    ref: Optional[str] = None
+    id: Optional[str] = None
+    role: Optional[str] = None
+    name: Optional[str] = None
+    tagName: Optional[str] = None
+    text: Optional[str] = None
+    disabled: Optional[bool] = False
+
+class PageInfo(BaseModel):
+    title: Optional[str] = ""
+    url: Optional[str] = ""
+    elements: List[Element] = []
+
+class ReasonRequest(BaseModel):
+    prompt: str
+    page_info: PageInfo
+    history: Optional[List[dict]] = []
+
+class Action(BaseModel):
+    thought: str
+    action: str
+    target_ref: Optional[str] = None
+    value: Optional[str] = None
+    verified_by_policy: bool = True
+
+from policy import verify_action_policy
+
+@app.post("/reason", response_model=Action)
+@app.post("/api/reason", response_model=Action)
+async def reason_endpoint(req: ReasonRequest):
+    """
+    Cloud Reasoning Server Endpoint
+    Parses prompt + sanitized PageInfo accessibility tree and returns verified structured JSON action.
+    Runs policy layer verification (policy.py) to reject hallucinated element targets.
+    """
+    prompt_lower = req.prompt.lower()
+    elements = req.page_info.elements
+    elements_dict = [el.dict() for el in elements]
+
+    proposed_action = None
+
+    # Check cookie / popup dismiss matching
+    if any(k in prompt_lower for k in ["dismiss", "cookie", "popup", "overlay", "banner"]):
+        for el in elements:
+            name_lower = (el.name or el.text or "").lower()
+            if any(term in name_lower for term in ["accept", "agree", "allow", "got it", "dismiss", "close"]):
+                proposed_action = {
+                    "thought": f"Identified cookie/modal dismiss target '{el.name or el.ref}'",
+                    "action": "CLICK",
+                    "target_ref": el.ref or el.id,
+                    "value": None
+                }
+                break
+
+    # Check search / fill matching
+    if not proposed_action and any(k in prompt_lower for k in ["search", "fill", "type", "enter"]):
+        for el in elements:
+            if el.role in ["textbox", "searchbox"] or el.tagName == "input":
+                proposed_action = {
+                    "thought": f"Identified input target element '{el.name or el.ref}'",
+                    "action": "TYPE",
+                    "target_ref": el.ref or el.id,
+                    "value": "Search Query"
+                }
+                break
+
+    # Fallback to first clickable button
+    if not proposed_action:
+        for el in elements:
+            if el.role in ["button", "link"] or el.tagName in ["button", "a"]:
+                proposed_action = {
+                    "thought": f"Targeting primary action button '{el.name or el.ref}'",
+                    "action": "CLICK",
+                    "target_ref": el.ref or el.id,
+                    "value": None
+                }
+                break
+
+    if not proposed_action:
+        proposed_action = {
+            "thought": "No actionable elements found on page.",
+            "action": "FINISH",
+            "target_ref": None,
+            "value": None
+        }
+
+    # Policy Layer Verification (policy.py)
+    verification = verify_action_policy(proposed_action, elements_dict)
+    final_action = verification["action"]
+
+    return Action(
+        thought=final_action.get("thought", "Action planned by Cloud Server"),
+        action=final_action.get("action", "FINISH"),
+        target_ref=final_action.get("target_ref"),
+        value=final_action.get("value"),
+        verified_by_policy=verification["valid"]
+    )
+
 class SanitizeRequest(BaseModel):
     text: str
 
@@ -254,3 +353,4 @@ async def sanitize_pii_endpoint(req: SanitizeRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
+

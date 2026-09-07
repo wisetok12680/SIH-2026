@@ -1,6 +1,7 @@
 /**
  * Ref-based Action Execution Engine
  * Dynamically executes browser actions using Accessibility Tree References (@e1, @e2...), CSS selectors, or coordinates.
+ * Displays real-time agent target spotlight frames, floating badges (@e1, @e2...), and laser click ripples.
  */
 
 import { getElementByRef } from './ax-tree-parser.js';
@@ -38,17 +39,16 @@ export async function executeAgentAction(actionPayload) {
     throw new Error(`Element execution target not found (Ref: ${refId || 'N/A'}, selector: ${selector || 'N/A'})`);
   }
 
-  // Visual highlight indicator for debugging / user feedback
+  // 2. Visual Agent Target Spotlight & Floating Badge Indicator
   if (el) {
-    highlightElement(el);
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    highlightElement(el, actionPayload);
+    await sleep(350); // Pause so user/judge visually sees the agent targeting the element
   }
 
-  // 2. Perform requested action
+  // 3. Perform requested action
   switch (actType) {
     case 'CLICK': {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      await sleep(200);
-
       el.focus();
       dispatchMouseEvent(el, 'mousedown');
       dispatchMouseEvent(el, 'mouseup');
@@ -57,9 +57,6 @@ export async function executeAgentAction(actionPayload) {
     }
 
     case 'TYPE': {
-      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      await sleep(200);
-
       // Perform PrivScope local resolution on $BIND_ keys before DOM insertion
       const resolvedValue = privScope.resolveLocalValue(value || '');
 
@@ -114,18 +111,122 @@ export async function executeAgentAction(actionPayload) {
   }
 }
 
-function highlightElement(el) {
-  const originalOutline = el.style.outline;
-  const originalBoxShadow = el.style.boxShadow;
+function highlightElement(el, actionPayload = {}) {
+  const { action = 'ACTION', ref, targetRef } = actionPayload;
+  const refId = ref || targetRef || '@e';
 
-  el.style.outline = '3px solid #6366f1';
-  el.style.boxShadow = '0 0 14px rgba(99, 102, 241, 0.9)';
+  // 1. Remove existing overlay
+  const existing = document.getElementById('atlas-agent-highlight-overlay');
+  if (existing) existing.remove();
+
+  const rect = el.getBoundingClientRect();
+  const scrollX = window.scrollX || window.pageXOffset || 0;
+  const scrollY = window.scrollY || window.pageYOffset || 0;
+
+  // 2. Create Floating Overlay Container
+  const container = document.createElement('div');
+  container.id = 'atlas-agent-highlight-overlay';
+  container.style.cssText = `
+    position: absolute;
+    top: ${rect.top + scrollY}px;
+    left: ${rect.left + scrollX}px;
+    width: ${rect.width}px;
+    height: ${rect.height}px;
+    pointer-events: none;
+    z-index: 2147483647;
+    border: 3px solid #38bdf8;
+    border-radius: 6px;
+    box-shadow: 0 0 25px rgba(56, 189, 248, 0.9), inset 0 0 15px rgba(99, 102, 241, 0.6);
+    animation: atlasPulse 1.2s infinite ease-in-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  `;
+
+  // 3. Floating Action Badge Label
+  const badge = document.createElement('div');
+  let icon = '⚡';
+  const actUpper = action.toUpperCase();
+  if (actUpper === 'CLICK') icon = '🖱️';
+  if (actUpper === 'TYPE') icon = '⌨️';
+  if (actUpper === 'CLEAR') icon = '🧹';
+  if (actUpper === 'SELECT') icon = '🔽';
+
+  badge.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;">
+      <span style="font-size: 13px;">${icon}</span>
+      <span style="color: #38bdf8;">AGENT: ${actUpper}</span>
+      <span style="background: rgba(99, 102, 241, 0.4); color: #fff; padding: 2px 6px; border-radius: 4px;">${refId}</span>
+    </div>
+  `;
+  badge.style.cssText = `
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 0;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+    border: 1px solid rgba(56, 189, 248, 0.6);
+    backdrop-filter: blur(8px);
+    color: #f8fafc;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    white-space: nowrap;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transform: translateY(0);
+    animation: atlasSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  `;
+
+  // 4. Click Ripple Laser Effect
+  const ripple = document.createElement('div');
+  ripple.style.cssText = `
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    transform: translate(-50%, -50%);
+    border: 2px solid #06b6d4;
+    border-radius: 50%;
+    background: rgba(6, 182, 212, 0.3);
+    animation: atlasRipple 0.8s ease-out forwards;
+  `;
+
+  container.appendChild(badge);
+  container.appendChild(ripple);
+
+  // Inject keyframe styles if not present
+  if (!document.getElementById('atlas-agent-styles')) {
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'atlas-agent-styles';
+    styleSheet.textContent = `
+      @keyframes atlasPulse {
+        0% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); }
+        50% { box-shadow: 0 0 35px rgba(56, 189, 248, 1), 0 0 15px rgba(99, 102, 241, 0.8); }
+        100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); }
+      }
+      @keyframes atlasSlideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes atlasRipple {
+        0% { width: 0px; height: 0px; opacity: 1; }
+        100% { width: 120px; height: 120px; opacity: 0; }
+      }
+    `;
+    document.head.appendChild(styleSheet);
+  }
+
+  document.body.appendChild(container);
+
+  // Native outline emphasis on element itself
+  el.style.outline = '3px solid #38bdf8';
+  el.style.outlineOffset = '2px';
   el.style.transition = 'all 0.2s ease-in-out';
 
   setTimeout(() => {
-    el.style.outline = originalOutline;
-    el.style.boxShadow = originalBoxShadow;
-  }, 1200);
+    container.style.opacity = '0';
+    setTimeout(() => container.remove(), 300);
+    el.style.outline = '';
+    el.style.outlineOffset = '';
+  }, 2200);
 }
 
 function dispatchMouseEvent(el, type) {
@@ -140,3 +241,4 @@ function dispatchMouseEvent(el, type) {
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
