@@ -123,7 +123,7 @@ function highlightElement(el, actionPayload = {}) {
   const scrollX = window.scrollX || window.pageXOffset || 0;
   const scrollY = window.scrollY || window.pageYOffset || 0;
 
-  // 2. Create Floating Overlay Container
+  // 2. Create Floating Target Frame (Clean Enterprise High-Contrast)
   const container = document.createElement('div');
   container.id = 'atlas-agent-highlight-overlay';
   container.style.cssText = `
@@ -134,99 +134,49 @@ function highlightElement(el, actionPayload = {}) {
     height: ${rect.height}px;
     pointer-events: none;
     z-index: 2147483647;
-    border: 3px solid #38bdf8;
-    border-radius: 6px;
-    box-shadow: 0 0 25px rgba(56, 189, 248, 0.9), inset 0 0 15px rgba(99, 102, 241, 0.6);
-    animation: atlasPulse 1.2s infinite ease-in-out;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid #6366f1;
+    border-radius: 4px;
+    background: rgba(99, 102, 241, 0.08);
+    transition: opacity 0.2s ease-in-out;
   `;
 
-  // 3. Floating Action Badge Label
+  // 3. Clean Floating Badge (No emojis, no gradients)
   const badge = document.createElement('div');
-  let icon = '⚡';
   const actUpper = action.toUpperCase();
-  if (actUpper === 'CLICK') icon = '🖱️';
-  if (actUpper === 'TYPE') icon = '⌨️';
-  if (actUpper === 'CLEAR') icon = '🧹';
-  if (actUpper === 'SELECT') icon = '🔽';
 
   badge.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 11px; letter-spacing: 0.5px; text-transform: uppercase;">
-      <span style="font-size: 13px;">${icon}</span>
-      <span style="color: #38bdf8;">AGENT: ${actUpper}</span>
-      <span style="background: rgba(99, 102, 241, 0.4); color: #fff; padding: 2px 6px; border-radius: 4px;">${refId}</span>
+    <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; font-family: 'Fira Code', monospace;">
+      <span style="color: #6366f1; font-weight: 700;">ACTION: ${actUpper}</span>
+      <span style="background: #334155; color: #f8fafc; padding: 2px 6px; border-radius: 3px;">${refId}</span>
     </div>
   `;
   badge.style.cssText = `
     position: absolute;
-    bottom: calc(100% + 8px);
+    bottom: calc(100% + 6px);
     left: 0;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
-    border: 1px solid rgba(56, 189, 248, 0.6);
-    backdrop-filter: blur(8px);
+    background: #0f172a;
+    border: 1px solid #334155;
     color: #f8fafc;
-    padding: 6px 12px;
-    border-radius: 8px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    padding: 4px 10px;
+    border-radius: 4px;
     white-space: nowrap;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    transform: translateY(0);
-    animation: atlasSlideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  `;
-
-  // 4. Click Ripple Laser Effect
-  const ripple = document.createElement('div');
-  ripple.style.cssText = `
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 20px;
-    height: 20px;
-    transform: translate(-50%, -50%);
-    border: 2px solid #06b6d4;
-    border-radius: 50%;
-    background: rgba(6, 182, 212, 0.3);
-    animation: atlasRipple 0.8s ease-out forwards;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   `;
 
   container.appendChild(badge);
-  container.appendChild(ripple);
-
-  // Inject keyframe styles if not present
-  if (!document.getElementById('atlas-agent-styles')) {
-    const styleSheet = document.createElement('style');
-    styleSheet.id = 'atlas-agent-styles';
-    styleSheet.textContent = `
-      @keyframes atlasPulse {
-        0% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); }
-        50% { box-shadow: 0 0 35px rgba(56, 189, 248, 1), 0 0 15px rgba(99, 102, 241, 0.8); }
-        100% { box-shadow: 0 0 15px rgba(56, 189, 248, 0.6); }
-      }
-      @keyframes atlasSlideDown {
-        from { opacity: 0; transform: translateY(-8px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      @keyframes atlasRipple {
-        0% { width: 0px; height: 0px; opacity: 1; }
-        100% { width: 120px; height: 120px; opacity: 0; }
-      }
-    `;
-    document.head.appendChild(styleSheet);
-  }
-
   document.body.appendChild(container);
 
-  // Native outline emphasis on element itself
-  el.style.outline = '3px solid #38bdf8';
+  // Native outline emphasis
+  el.style.outline = '2px solid #6366f1';
   el.style.outlineOffset = '2px';
-  el.style.transition = 'all 0.2s ease-in-out';
 
   setTimeout(() => {
     container.style.opacity = '0';
-    setTimeout(() => container.remove(), 300);
+    setTimeout(() => container.remove(), 200);
     el.style.outline = '';
     el.style.outlineOffset = '';
-  }, 2200);
+  }, 1800);
 }
 
 function dispatchMouseEvent(el, type) {

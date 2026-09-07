@@ -6,20 +6,18 @@
   <title>Atlas & Comet Agent - Feature Showcase Sub-Pages</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #090d16;
-      --card-bg: rgba(22, 30, 46, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --card-hover-border: rgba(99, 102, 241, 0.4);
-      --primary: #6366f1;
-      --primary-hover: #4f46e5;
-      --accent-cyan: #06b6d4;
-      --accent-purple: #a855f7;
-      --accent-emerald: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-rose: #f43f5e;
+      --bg-dark: #0b0f19;
+      --card-bg: #161e2e;
+      --card-border: #1e293b;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --accent-cyan: #0284c7;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --accent-rose: #dc2626;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --input-bg: #0f172a;
@@ -32,12 +30,8 @@
     body {
       font-family: var(--font-sans);
       background: var(--bg-dark);
-      background-image: 
-        radial-gradient(at 15% 15%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 85% 85%, rgba(168, 85, 247, 0.12) 0px, transparent 50%);
-      background-attachment: fixed;
       color: var(--text-main);
-      padding: 30px 20px;
+      padding: 24px 20px;
       line-height: 1.6;
     }
 
@@ -48,121 +42,96 @@
 
     /* Header Banner */
     .hero-header {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      background: #0f172a;
       border: 1px solid var(--card-border);
-      backdrop-filter: blur(12px);
-      border-radius: 16px;
-      padding: 24px 32px;
-      margin-bottom: 24px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .hero-header::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 3px;
-      background: linear-gradient(90deg, var(--primary), var(--accent-cyan), var(--accent-purple));
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
     }
 
     .badge-pill {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      background: rgba(99, 102, 241, 0.15);
-      color: #818cf8;
-      border: 1px solid rgba(99, 102, 241, 0.3);
+      background: #312e81;
+      color: #a5b4fc;
+      border: 1px solid #4338ca;
       margin-bottom: 8px;
     }
 
     .hero-title {
-      font-size: 26px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      color: #ffffff;
       margin-bottom: 4px;
     }
 
     .hero-subtitle {
       color: var(--text-muted);
-      font-size: 14px;
+      font-size: 13px;
     }
 
     /* Sub-Page Navigation Bar */
     .subpage-nav {
       display: flex;
-      gap: 8px;
-      background: rgba(15, 23, 42, 0.8);
+      gap: 6px;
+      background: #0f172a;
       border: 1px solid var(--card-border);
       padding: 6px;
-      border-radius: 12px;
-      margin-bottom: 24px;
+      border-radius: 8px;
+      margin-bottom: 20px;
       overflow-x: auto;
-      backdrop-filter: blur(8px);
     }
 
     .subpage-btn {
       flex: 1;
-      padding: 10px 14px;
+      padding: 8px 12px;
       background: transparent;
-      border: none;
+      border: 1px solid transparent;
       color: var(--text-muted);
       font-family: var(--font-sans);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: 6px;
       cursor: pointer;
       white-space: nowrap;
-      transition: all 0.2s ease-in-out;
+      transition: all 0.15s ease-in-out;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 6px;
     }
 
     .subpage-btn:hover {
       color: var(--text-main);
-      background: rgba(255, 255, 255, 0.05);
+      background: #1e293b;
     }
 
     .subpage-btn.active {
       background: var(--primary);
       color: #ffffff;
-      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
     }
 
     /* Sub-Page View Containers */
     .subpage-view {
       display: none;
-      animation: fadeIn 0.3s ease-in-out;
     }
 
     .subpage-view.active {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
     /* Card Styling */
     .station-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 16px;
-      padding: 28px;
-      backdrop-filter: blur(12px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      padding: 24px;
     }
 
     .station-header {
@@ -174,20 +143,8 @@
       border-bottom: 1px solid var(--card-border);
     }
 
-    .station-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-    }
-
     .station-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: #ffffff;
     }
@@ -205,8 +162,8 @@
 
     .form-label {
       display: block;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       color: var(--text-muted);
       margin-bottom: 6px;
       text-transform: uppercase;
@@ -215,51 +172,48 @@
 
     .form-input {
       width: 100%;
-      padding: 10px 14px;
+      padding: 9px 12px;
       background: var(--input-bg);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
+      border-radius: 6px;
       color: var(--text-main);
       font-family: var(--font-sans);
       font-size: 13px;
       outline: none;
-      transition: all 0.2s;
+      transition: border-color 0.15s;
     }
 
     .form-input:focus {
       border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
     }
 
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      padding: 10px 18px;
-      border-radius: 8px;
+      padding: 9px 16px;
+      border-radius: 6px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       border: none;
       background: var(--primary);
       color: white;
-      transition: all 0.2s;
+      transition: background 0.15s;
     }
 
     .btn:hover {
       background: var(--primary-hover);
-      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.08);
+      background: #334155;
       color: var(--text-main);
       border: 1px solid var(--card-border);
     }
 
     .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.15);
+      background: #475569;
     }
 
     .btn-danger {
@@ -267,12 +221,12 @@
     }
 
     .console-out {
-      background: #050811;
+      background: #030712;
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 12px 16px;
+      border-radius: 6px;
+      padding: 12px;
       font-family: var(--font-mono);
-      font-size: 12px;
+      font-size: 11px;
       color: #38bdf8;
       max-height: 140px;
       overflow-y: auto;
@@ -282,8 +236,8 @@
     /* Overlay Box */
     .overlay-box {
       background: #1e293b;
-      border: 1px solid var(--primary);
-      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
       padding: 16px;
     }
 
@@ -297,22 +251,23 @@
       flex: 1;
       text-align: center;
       padding: 8px;
-      background: rgba(255, 255, 255, 0.04);
-      border-radius: 6px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 4px;
       font-size: 12px;
       font-weight: 600;
       color: var(--text-muted);
     }
 
     .wizard-step.active {
-      background: rgba(99, 102, 241, 0.2);
-      color: #818cf8;
-      border: 1px solid rgba(99, 102, 241, 0.4);
+      background: #312e81;
+      color: #a5b4fc;
+      border-color: #4338ca;
     }
 
     canvas {
-      background: #050811;
-      border-radius: 8px;
+      background: #030712;
+      border-radius: 6px;
       border: 1px solid var(--card-border);
       width: 100%;
       max-width: 480px;
@@ -325,7 +280,7 @@
     
     <!-- Header -->
     <header class="hero-header">
-      <div class="badge-pill">✨ Atlas & Comet Agent Test Lab</div>
+      <div class="badge-pill">ATLAS & COMET TEST LAB</div>
       <h1 class="hero-title">Feature Showcase Sub-Pages</h1>
       <p class="hero-subtitle">Select any sub-page below to demonstrate isolated agent capabilities in real time.</p>
     </header>
@@ -333,22 +288,22 @@
     <!-- Sub-Page Navigation Bar -->
     <nav class="subpage-nav">
       <button class="subpage-btn active" id="btn-subpage-1" onclick="switchSubpage(1)">
-        <span>🎯</span> 1. AX Tree Layout
+        1. AX Tree Layout
       </button>
       <button class="subpage-btn" id="btn-subpage-2" onclick="switchSubpage(2)">
-        <span>🛡️</span> 2. Privacy & PII
+        2. Privacy & PII
       </button>
       <button class="subpage-btn" id="btn-subpage-3" onclick="switchSubpage(3)">
-        <span>📊</span> 3. Visual ML Canvas
+        3. Visual ML Canvas
       </button>
       <button class="subpage-btn" id="btn-subpage-4" onclick="switchSubpage(4)">
-        <span>🍪</span> 4. Interrupts & CAPTCHA
+        4. Interrupts & CAPTCHA
       </button>
       <button class="subpage-btn" id="btn-subpage-5" onclick="switchSubpage(5)">
-        <span>⚡</span> 5. Trajectory Wizard
+        5. Trajectory Wizard
       </button>
       <button class="subpage-btn" id="btn-subpage-6" onclick="switchSubpage(6)">
-        <span>📄</span> 6. Agentic Job Application
+        6. Job Application Form
       </button>
     </nav>
 
@@ -356,7 +311,6 @@
     <div class="subpage-view active" id="subpage-1">
       <div class="station-card">
         <div class="station-header">
-          <div class="station-icon">🎯</div>
           <div>
             <div class="station-title">Sub-Page 1: AX Tree & Bounding Screen Map</div>
             <div class="station-desc">Test layout extraction, element boundary detection, and ARIA reference tagging (@e1, @e2...).</div>
@@ -377,8 +331,8 @@
                 <option value="ml">Machine Learning</option>
               </select>
             </div>
-            <button class="btn" id="submitSearchBtn" onclick="logConsole('Search query submitted successfully!')">
-              🔍 Submit Search Action
+            <button class="btn" id="submitSearchBtn" onclick="logConsole('Search query submitted successfully.')">
+              Submit Search Action
             </button>
           </div>
 
@@ -408,7 +362,6 @@
     <div class="subpage-view" id="subpage-2">
       <div class="station-card">
         <div class="station-header">
-          <div class="station-icon">🛡️</div>
           <div>
             <div class="station-title">Sub-Page 2: Privacy Preserving Filter & PrivScope</div>
             <div class="station-desc">Demonstrates client-side PII regex masking and on-device hardware table binding ($BIND_).</div>
@@ -442,7 +395,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Live Client Sanitized Preview</label>
-              <div id="piiPreviewBox" style="background: #050811; border: 1px solid var(--card-border); padding: 10px; border-radius: 8px; font-family: var(--font-mono); font-size: 12px; color: #10b981;">
+              <div id="piiPreviewBox" style="background: #030712; border: 1px solid var(--card-border); padding: 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; color: #10b981;">
                 Initializing PII preview...
               </div>
             </div>
@@ -459,7 +412,6 @@
     <div class="subpage-view" id="subpage-3">
       <div class="station-card">
         <div class="station-header">
-          <div class="station-icon">📊</div>
           <div>
             <div class="station-title">Sub-Page 3: Visual ML Inspection (YOLO + EasyOCR)</div>
             <div class="station-desc">Parses non-DOM graphics, embedded charts, and canvas elements using visual ML.</div>
@@ -474,7 +426,7 @@
             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
               Standard DOM tree inspection cannot read pixels inside HTML5 Canvas. Our visual ML server runs YOLOv8-nano UI bounding and PP-OCR text extraction.
             </p>
-            <button class="btn" onclick="drawCanvasGraph()">🎨 Redraw Canvas Data</button>
+            <button class="btn" onclick="drawCanvasGraph()">Redraw Canvas Data</button>
           </div>
         </div>
 
@@ -488,7 +440,6 @@
     <div class="subpage-view" id="subpage-4">
       <div class="station-card">
         <div class="station-header">
-          <div class="station-icon">🍪</div>
           <div>
             <div class="station-title">Sub-Page 4: Overlays, Cookie Banners & CAPTCHA Pause</div>
             <div class="station-desc">Tests auto-dismissal of cookie consent overlays and automated CAPTCHA challenge pause/resume.</div>
@@ -496,20 +447,20 @@
         </div>
 
         <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-          <button class="btn btn-secondary" onclick="toggleCookieOverlay(true)">🍪 Show Cookie Overlay Banner</button>
-          <button class="btn btn-danger" onclick="toggleCaptchaWidget(true)">⚠️ Trigger CAPTCHA Challenge</button>
+          <button class="btn btn-secondary" onclick="toggleCookieOverlay(true)">Show Cookie Overlay Banner</button>
+          <button class="btn btn-danger" onclick="toggleCaptchaWidget(true)">Trigger CAPTCHA Challenge</button>
         </div>
 
         <!-- CAPTCHA Simulation Widget -->
-        <div id="captchaSimWidget" style="display: none; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+        <div id="captchaSimWidget" style="display: none; background: #4c0519; border: 1px solid #9f1239; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <div>
-              <strong style="color: #f43f5e; font-size: 14px;">Cloudflare Turnstile CAPTCHA Widget Challenge</strong>
-              <p style="font-size: 12px; color: var(--text-muted);">Simulates an active CAPTCHA challenge triggering agent pause.</p>
+              <strong style="color: #fb7185; font-size: 13px;">Cloudflare Turnstile CAPTCHA Widget Challenge</strong>
+              <p style="font-size: 12px; color: #fecdd3;">Simulates an active CAPTCHA challenge triggering agent pause.</p>
             </div>
-            <button class="btn" onclick="toggleCaptchaWidget(false)" style="background: #10b981;">✅ Resolve CAPTCHA</button>
+            <button class="btn" onclick="toggleCaptchaWidget(false)" style="background: #059669;">Resolve CAPTCHA</button>
           </div>
-          <iframe title="reCAPTCHA challenge simulation" src="about:blank" style="width: 100%; height: 60px; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; border-radius: 6px;"></iframe>
+          <iframe title="reCAPTCHA challenge simulation" src="about:blank" style="width: 100%; height: 60px; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; border-radius: 4px;"></iframe>
         </div>
 
         <div class="console-out" id="console-subpage-4">
@@ -522,7 +473,6 @@
     <div class="subpage-view" id="subpage-5">
       <div class="station-card">
         <div class="station-header">
-          <div class="station-icon">⚡</div>
           <div>
             <div class="station-title">Sub-Page 5: Multi-Step Wizard & 0ms Trajectory Cache</div>
             <div class="station-desc">Validates multi-step form completion and instant 0ms AI bypass trajectory replay.</div>
@@ -558,12 +508,12 @@
 
         <!-- Step 3 -->
         <div id="wizStep3Content" style="display: none;">
-          <p style="font-size: 14px; color: #10b981; margin-bottom: 12px;">
-            ✅ All wizard steps validated! Click complete to save trajectory into local storage.
+          <p style="font-size: 13px; color: #10b981; margin-bottom: 12px;">
+            All wizard steps validated! Click complete to save trajectory into local storage.
           </p>
           <div style="display: flex; gap: 10px;">
             <button class="btn btn-secondary" onclick="goToWizStep(2)">← Back</button>
-            <button class="btn" id="finishWizardBtn" onclick="finishWizardTrajectory()">⚡ Complete & Cache Trajectory</button>
+            <button class="btn" id="finishWizardBtn" onclick="finishWizardTrajectory()">Complete & Cache Trajectory</button>
           </div>
         </div>
 
@@ -577,7 +527,6 @@
     <div class="subpage-view" id="subpage-6">
       <div class="station-card">
         <div class="station-header">
-          <div class="station-icon">📄</div>
           <div>
             <div class="station-title">Sub-Page 6: Agentic Job Application Form</div>
             <div class="station-desc">Automated candidate application form filling. Type "Fill job application form" in sidepanel!</div>
@@ -619,8 +568,8 @@
             <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
               <input type="checkbox" id="jobPrivacyCheck" /> I agree to data privacy terms & PrivScope local encryption.
             </label>
-            <button type="submit" class="btn" id="submitJobAppBtn" style="background: #10b981;">
-              📄 Submit Application
+            <button type="submit" class="btn" id="submitJobAppBtn" style="background: #059669;">
+              Submit Application
             </button>
           </div>
         </form>
@@ -634,9 +583,9 @@
   </div>
 
   <!-- Cookie Modal Overlay -->
-  <div class="overlay-box" id="cookieBannerOverlay" style="position: fixed; bottom: 20px; right: 20px; max-width: 380px; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.6); display: none;">
+  <div class="overlay-box" id="cookieBannerOverlay" style="position: fixed; bottom: 20px; right: 20px; max-width: 380px; z-index: 9999; display: none;">
     <p style="font-size: 13px; color: white; margin-bottom: 10px;">
-      🍪 <strong>Cookie & Privacy Consent:</strong> We use cookies to enhance testing performance.
+      <strong>Cookie & Privacy Consent:</strong> We use cookies to enhance testing performance.
     </p>
     <div style="display: flex; gap: 8px;">
       <button class="btn" id="acceptAllCookiesBtn" onclick="toggleCookieOverlay(false)" style="font-size: 12px; padding: 6px 12px;">Accept All Cookies</button>
@@ -696,7 +645,7 @@
       const ctx = canvas.getContext('2d');
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      ctx.fillStyle = '#050811';
+      ctx.fillStyle = '#030712';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.beginPath();
@@ -705,12 +654,12 @@
       ctx.lineTo(200, 130);
       ctx.lineTo(320, 40);
       ctx.lineTo(440, 70);
-      ctx.strokeStyle = '#6366f1';
+      ctx.strokeStyle = '#4f46e5';
       ctx.lineWidth = 3;
       ctx.stroke();
 
       ctx.fillStyle = '#38bdf8';
-      ctx.font = 'bold 15px Inter, sans-serif';
+      ctx.font = '600 15px Inter, sans-serif';
       ctx.fillText('YOLO + PP-OCR Node Target: $84,920', 30, 40);
     }
 
@@ -741,15 +690,15 @@
     }
 
     function finishWizardTrajectory() {
-      logConsole('⚡ Wizard Trajectory Completed & Cached locally!');
+      logConsole('Wizard Trajectory Completed & Cached locally!');
     }
 
     // Sub-Page 6: Job Application Submission
     function submitJobApplication() {
       const name = document.getElementById('jobFullName')?.value || 'Alexander Vance';
       const role = document.getElementById('jobExperience')?.value || '5 years';
-      logConsole(`✅ JOB APPLICATION SUBMITTED SUCCESSFULLY! Candidate: ${name} (${role} experience)`);
-      alert(`🎉 Application Submitted Successfully!\nCandidate: ${name}\nStatus: Processed Agentically by Atlas & Comet!`);
+      logConsole(`JOB APPLICATION SUBMITTED SUCCESSFULLY! Candidate: ${name} (${role} experience)`);
+      alert(`Application Submitted Successfully!\nCandidate: ${name}\nStatus: Processed Agentically by Atlas & Comet!`);
     }
 
     // Initialize

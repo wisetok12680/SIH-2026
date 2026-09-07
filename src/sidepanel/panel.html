@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atlas & Comet Hybrid Agent</title>
+  <title>Atlas & Comet Agent</title>
   <link rel="stylesheet" href="panel.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
   <div class="app-container">
@@ -15,10 +15,10 @@
     <!-- Header -->
     <header class="header">
       <div class="brand">
-        <div class="logo-icon">✨</div>
+        <div class="logo-icon">AC</div>
         <div>
           <h1 class="app-title">Atlas & Comet</h1>
-          <p class="app-subtitle">Autonomous Local & Cloud Agent</p>
+          <p class="app-subtitle">Autonomous Local Agent</p>
         </div>
       </div>
       <div class="badge-group">
@@ -30,10 +30,10 @@
 
     <!-- CAPTCHA Alert Banner (Hidden by default) -->
     <div class="captcha-banner" id="captchaBanner" style="display: none;">
-      <div class="captcha-icon">⚠️</div>
+      <div class="captcha-icon">!</div>
       <div class="captcha-info">
         <span class="captcha-title">CAPTCHA Challenge Detected</span>
-        <span class="captcha-desc">Automation paused. Solve the CAPTCHA in the active browser tab to resume automatically!</span>
+        <span class="captcha-desc">Automation paused. Solve the CAPTCHA in the active browser tab to resume automatically.</span>
       </div>
     </div>
 
@@ -43,24 +43,19 @@
       <!-- Vertical Side Navigation Panel -->
       <nav class="side-nav">
         <button class="nav-btn active" data-tab="tab-control" title="Control Center">
-          <span class="nav-icon">⚡</span>
-          <span class="nav-label">Control</span>
+          <span class="nav-label">CONTROL</span>
         </button>
         <button class="nav-btn" data-tab="tab-ax" title="Accessibility Ref Tree">
-          <span class="nav-icon">🎯</span>
-          <span class="nav-label">AX Tree</span>
+          <span class="nav-label">AX TREE</span>
         </button>
         <button class="nav-btn" data-tab="tab-map" title="Physical Bounding Map">
-          <span class="nav-icon">📐</span>
-          <span class="nav-label">Map</span>
+          <span class="nav-label">MAP</span>
         </button>
         <button class="nav-btn" data-tab="tab-privscope" title="PrivScope Protection">
-          <span class="nav-icon">🛡️</span>
-          <span class="nav-label">PrivScope</span>
+          <span class="nav-label">PRIVACY</span>
         </button>
         <button class="nav-btn" data-tab="tab-settings" title="Engine Settings">
-          <span class="nav-icon">⚙️</span>
-          <span class="nav-label">Config</span>
+          <span class="nav-label">CONFIG</span>
         </button>
       </nav>
 
@@ -72,22 +67,22 @@
           <section class="card input-card">
             <div class="card-header">
               <label for="taskPrompt" class="card-label">Task Goal & Instructions</label>
-              <span class="cache-indicator" id="cacheHitIndicator" style="display: none;">⚡ Fast Replay Ready</span>
+              <span class="cache-indicator" id="cacheHitIndicator" style="display: none;">Fast Replay Ready</span>
             </div>
             <textarea 
               id="taskPrompt" 
               class="task-textarea" 
-              placeholder="e.g. Type search query or instruction..."
+              placeholder="Enter task goal or instruction..."
               rows="3"
             ></textarea>
             
             <!-- Equal Width Floating Action Buttons -->
             <div class="button-group-floating">
               <button id="startAgentBtn" class="btn btn-primary btn-equal">
-                <span class="btn-icon">▶</span> Start Task
+                Start Task
               </button>
               <button id="stopAgentBtn" class="btn btn-danger btn-equal" disabled>
-                <span class="btn-icon">⏹</span> Stop
+                Stop
               </button>
             </div>
           </section>
@@ -100,7 +95,7 @@
             </div>
             <div class="log-container" id="logContainer">
               <div class="log-entry log-info">
-                <span class="log-time">[System]</span> Atlas & Comet Hybrid Agent Ready. PrivScope local encryption active.
+                <span class="log-time">[System]</span> Atlas & Comet Agent Ready. PrivScope active.
               </div>
             </div>
           </section>
@@ -120,7 +115,7 @@
             </div>
 
             <div class="ax-tree-view" id="axTreeView">
-              <div class="empty-state">Click "Scan Tree" or launch a task to populate Reference IDs...</div>
+              <div class="empty-state">Click "Scan Tree" or launch a task to populate Reference IDs.</div>
             </div>
           </section>
         </main>
@@ -133,7 +128,7 @@
               <button id="refreshMapBtn" class="btn-secondary">Scan Map</button>
             </div>
             <p class="card-desc">Physical bounding boxes (x, y, w, h) & DOM elements with local PII filter active.</p>
-            <pre class="json-viewer" id="jsonViewer"><code>Click "Scan Map" to view physical bounding screen map...</code></pre>
+            <pre class="json-viewer" id="jsonViewer"><code>Click "Scan Map" to view physical bounding screen map.</code></pre>
           </section>
         </main>
 
@@ -208,7 +203,7 @@
             </div>
 
             <div style="margin-top: 14px;">
-              <button id="clearCacheBtn" class="btn btn-secondary" style="width: 100%;">⚡ Clear All Cached Trajectories</button>
+              <button id="clearCacheBtn" class="btn btn-secondary" style="width: 100%;">Clear All Cached Trajectories</button>
             </div>
           </section>
         </main>
