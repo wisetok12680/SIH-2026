@@ -20,11 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const scanAxBtn = document.getElementById('scanAxBtn');
   const axTreeView = document.getElementById('axTreeView');
   const axSearchInput = document.getElementById('axSearchInput');
-  const chips = document.querySelectorAll('.chip');
-
-  const toggleTrajectoryCache = document.getElementById('toggleTrajectoryCache');
-  const togglePrivScope = document.getElementById('togglePrivScope');
-  const toggleAutoModals = document.getElementById('toggleAutoModals');
+  const toggleTrajectoryCache = document.getElementById('toggleTrajectoryCache') || { checked: true };
+  const togglePrivScope = document.getElementById('togglePrivScope') || { checked: true };
+  const toggleAutoModals = document.getElementById('toggleAutoModals') || { checked: true };
   const clearCacheBtn = document.getElementById('clearCacheBtn');
   const refreshCacheListBtn = document.getElementById('refreshCacheListBtn');
   const cacheList = document.getElementById('cacheList');
@@ -41,14 +39,18 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       const res = await fetch('http://localhost:8000/health');
       if (res.ok) {
-        backendHealthBadge.innerText = 'ML: ON';
-        backendHealthBadge.className = 'status-badge online';
+        if (backendHealthBadge) {
+          backendHealthBadge.innerText = 'ML: ON';
+          backendHealthBadge.className = 'status-badge online';
+        }
       } else {
         throw new Error();
       }
     } catch (e) {
-      backendHealthBadge.innerText = 'ML: OFF';
-      backendHealthBadge.className = 'status-badge offline';
+      if (backendHealthBadge) {
+        backendHealthBadge.innerText = 'ML: OFF';
+        backendHealthBadge.className = 'status-badge offline';
+      }
     }
   }
 
@@ -61,17 +63,11 @@ document.addEventListener('DOMContentLoaded', () => {
       tabContents.forEach((tc) => tc.classList.remove('active'));
 
       btn.classList.add('active');
-      document.getElementById(targetTab).classList.add('active');
+      const targetEl = document.getElementById(targetTab);
+      if (targetEl) targetEl.classList.add('active');
 
       if (targetTab === 'tab-settings') loadCacheList();
       if (targetTab === 'tab-privscope') loadPrivScopeBindings();
-    });
-  });
-
-  // 3. Preset Chips
-  chips.forEach((chip) => {
-    chip.addEventListener('click', () => {
-      taskPrompt.value = chip.getAttribute('data-preset');
     });
   });
 
