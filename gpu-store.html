@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TechNexus Marketplace - High-Performance Workstation GPUs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0b0f19;
+      --card-bg: #161e2e;
+      --card-border: #1e293b;
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --accent-emerald: #059669;
+      --accent-amber: #d97706;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --input-bg: #0f172a;
+      --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+      --font-mono: 'Fira Code', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-dark);
+      color: var(--text-main);
+      padding: 24px 20px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* Navbar Header */
+    .store-header {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--primary);
+      color: white;
+      font-weight: 800;
+      font-size: 18px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .brand-subtitle {
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .search-bar-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      max-width: 480px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 6px;
+      color: var(--text-main);
+      font-size: 13px;
+      outline: none;
+    }
+
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+
+    .cart-summary {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #1e293b;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Banner */
+    .category-banner {
+      background: #1e1b4b;
+      border: 1px solid #4338ca;
+      border-radius: 10px;
+      padding: 18px 24px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .banner-text h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: #c7d2fe;
+    }
+
+    .banner-text p {
+      font-size: 13px;
+      color: #a5b4fc;
+    }
+
+    .badge-tag {
+      background: #312e81;
+      color: #818cf8;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* Grid Layout */
+    .gpu-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .gpu-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: border-color 0.2s;
+    }
+
+    .gpu-card:hover {
+      border-color: #3b82f6;
+    }
+
+    .gpu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .gpu-vendor {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #60a5fa;
+    }
+
+    .gpu-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-top: 2px;
+    }
+
+    .gpu-price {
+      font-size: 18px;
+      font-weight: 700;
+      color: #34d399;
+      font-family: var(--font-mono);
+    }
+
+    /* Specs Table */
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 14px 0;
+      font-size: 12px;
+    }
+
+    .specs-table td {
+      padding: 6px 0;
+      border-bottom: 1px dashed #1e293b;
+    }
+
+    .specs-table td.spec-key {
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .specs-table td.spec-val {
+      color: #f8fafc;
+      font-weight: 600;
+      text-align: right;
+      font-family: var(--font-mono);
+    }
+
+    .features-list {
+      margin-bottom: 16px;
+    }
+
+    .feature-tag {
+      display: inline-block;
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: #cbd5e1;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+    }
+
+    /* Actions */
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 9px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      text-align: center;
+      transition: background 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    .btn-secondary {
+      background: #334155;
+      color: var(--text-main);
+      border: 1px solid var(--card-border);
+    }
+
+    .btn-secondary:hover {
+      background: #475569;
+    }
+
+    .console-out {
+      background: #030712;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #38bdf8;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Navbar Header -->
+    <header class="store-header">
+      <div class="brand-group">
+        <div class="brand-icon">TN</div>
+        <div>
+          <h1 class="brand-title">TechNexus Store</h1>
+          <p class="brand-subtitle">Enterprise Workstation & AI Accelerators</p>
+        </div>
+      </div>
+
+      <div class="search-bar-container">
+        <input type="text" id="gpuSearchBox" class="search-input" placeholder="Search GPUs (e.g. RTX 4090, 24GB VRAM)..." />
+        <button class="btn btn-secondary" onclick="logStoreAction('Searched GPU catalog')">Search</button>
+      </div>
+
+      <div class="cart-summary">
+        <span>Cart: <strong id="cartCount">0</strong> items</span>
+      </div>
+    </header>
+
+    <!-- Banner -->
+    <div class="category-banner">
+      <div class="banner-text">
+        <h2>AI Model Training & Inference Hardware Catalog</h2>
+        <p>Compare raw compute TFLOPS, VRAM capacity, memory bandwidth, and pricing for LLM fine-tuning.</p>
+      </div>
+      <div class="badge-tag">SWAPPABLE REASONING ENGINE ACTIVE</div>
+    </div>
+
+    <!-- GPU Products Grid -->
+    <div class="gpu-grid">
+      
+      <!-- GPU 1: RTX 4090 -->
+      <div class="gpu-card" id="card-rtx4090">
+        <div>
+          <div class="gpu-header">
+            <div>
+              <div class="gpu-vendor">NVIDIA Architecture</div>
+              <h3 class="gpu-title">GeForce RTX 4090</h3>
+            </div>
+            <div class="gpu-price">$1,599</div>
+          </div>
+
+          <div class="features-list">
+            <span class="feature-tag">24GB GDDR6X</span>
+            <span class="feature-tag">Ada Lovelace</span>
+            <span class="feature-tag">DLSS 3.5</span>
+            <span class="feature-tag">AI Workstation</span>
+          </div>
+
+          <table class="specs-table">
+            <tr><td class="spec-key">VRAM Memory</td><td class="spec-val">24 GB GDDR6X</td></tr>
+            <tr><td class="spec-key">Memory Bus</td><td class="spec-val">384-bit (1,008 GB/s)</td></tr>
+            <tr><td class="spec-key">CUDA Cores</td><td class="spec-val">16,384 Cores</td></tr>
+            <tr><td class="spec-key">FP32 Compute</td><td class="spec-val">82.6 TFLOPS</td></tr>
+            <tr><td class="spec-key">TDP Power</td><td class="spec-val">450 Watts</td></tr>
+            <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$66.62 / GB</td></tr>
+          </table>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for NVIDIA RTX 4090')">Inspect Specs</button>
+          <button class="btn btn-primary" onclick="addToCart('NVIDIA RTX 4090')">Add to Cart</button>
+        </div>
+      </div>
+
+      <!-- GPU 2: RTX 4080 Super -->
+      <div class="gpu-card" id="card-rtx4080s">
+        <div>
+          <div class="gpu-header">
+            <div>
+              <div class="gpu-vendor">NVIDIA Architecture</div>
+              <h3 class="gpu-title">GeForce RTX 4080 Super</h3>
+            </div>
+            <div class="gpu-price">$999</div>
+          </div>
+
+          <div class="features-list">
+            <span class="feature-tag">16GB GDDR6X</span>
+            <span class="feature-tag">Ada Lovelace</span>
+            <span class="feature-tag">Tensor Cores v4</span>
+          </div>
+
+          <table class="specs-table">
+            <tr><td class="spec-key">VRAM Memory</td><td class="spec-val">16 GB GDDR6X</td></tr>
+            <tr><td class="spec-key">Memory Bus</td><td class="spec-val">256-bit (736 GB/s)</td></tr>
+            <tr><td class="spec-key">CUDA Cores</td><td class="spec-val">10,240 Cores</td></tr>
+            <tr><td class="spec-key">FP32 Compute</td><td class="spec-val">52.2 TFLOPS</td></tr>
+            <tr><td class="spec-key">TDP Power</td><td class="spec-val">320 Watts</td></tr>
+            <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$62.43 / GB</td></tr>
+          </table>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for NVIDIA RTX 4080 Super')">Inspect Specs</button>
+          <button class="btn btn-primary" onclick="addToCart('NVIDIA RTX 4080 Super')">Add to Cart</button>
+        </div>
+      </div>
+
+      <!-- GPU 3: Radeon RX 7900 XTX -->
+      <div class="gpu-card" id="card-rx7900xtx">
+        <div>
+          <div class="gpu-header">
+            <div>
+              <div class="gpu-vendor">AMD Architecture</div>
+              <h3 class="gpu-title">Radeon RX 7900 XTX</h3>
+            </div>
+            <div class="gpu-price">$949</div>
+          </div>
+
+          <div class="features-list">
+            <span class="feature-tag">24GB GDDR6</span>
+            <span class="feature-tag">RDNA 3 Chiplet</span>
+            <span class="feature-tag">DisplayPort 2.1</span>
+          </div>
+
+          <table class="specs-table">
+            <tr><td class="spec-key">VRAM Memory</td><td class="spec-val">24 GB GDDR6</td></tr>
+            <tr><td class="spec-key">Memory Bus</td><td class="spec-val">384-bit (960 GB/s)</td></tr>
+            <tr><td class="spec-key">Stream Processors</td><td class="spec-val">6,144 Processors</td></tr>
+            <tr><td class="spec-key">FP32 Compute</td><td class="spec-val">61.4 TFLOPS</td></tr>
+            <tr><td class="spec-key">TDP Power</td><td class="spec-val">355 Watts</td></tr>
+            <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$39.54 / GB</td></tr>
+          </table>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for AMD RX 7900 XTX')">Inspect Specs</button>
+          <button class="btn btn-primary" onclick="addToCart('AMD RX 7900 XTX')">Add to Cart</button>
+        </div>
+      </div>
+
+      <!-- GPU 4: RTX 4070 Ti Super -->
+      <div class="gpu-card" id="card-rtx4070tis">
+        <div>
+          <div class="gpu-header">
+            <div>
+              <div class="gpu-vendor">NVIDIA Architecture</div>
+              <h3 class="gpu-title">GeForce RTX 4070 Ti Super</h3>
+            </div>
+            <div class="gpu-price">$799</div>
+          </div>
+
+          <div class="features-list">
+            <span class="feature-tag">16GB GDDR6X</span>
+            <span class="feature-tag">Ada Lovelace</span>
+            <span class="feature-tag">AV1 Dual Encoder</span>
+          </div>
+
+          <table class="specs-table">
+            <tr><td class="spec-key">VRAM Memory</td><td class="spec-val">16 GB GDDR6X</td></tr>
+            <tr><td class="spec-key">Memory Bus</td><td class="spec-val">256-bit (672 GB/s)</td></tr>
+            <tr><td class="spec-key">CUDA Cores</td><td class="spec-val">8,448 Cores</td></tr>
+            <tr><td class="spec-key">FP32 Compute</td><td class="spec-val">44.1 TFLOPS</td></tr>
+            <tr><td class="spec-key">TDP Power</td><td class="spec-val">285 Watts</td></tr>
+            <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$49.93 / GB</td></tr>
+          </table>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for RTX 4070 Ti Super')">Inspect Specs</button>
+          <button class="btn btn-primary" onclick="addToCart('RTX 4070 Ti Super')">Add to Cart</button>
+        </div>
+      </div>
+
+      <!-- GPU 5: Radeon RX 7900 XT -->
+      <div class="gpu-card" id="card-rx7900xt">
+        <div>
+          <div class="gpu-header">
+            <div>
+              <div class="gpu-vendor">AMD Architecture</div>
+              <h3 class="gpu-title">Radeon RX 7900 XT</h3>
+            </div>
+            <div class="gpu-price">$749</div>
+          </div>
+
+          <div class="features-list">
+            <span class="feature-tag">20GB GDDR6</span>
+            <span class="feature-tag">RDNA 3</span>
+            <span class="feature-tag">Infinity Cache v2</span>
+          </div>
+
+          <table class="specs-table">
+            <tr><td class="spec-key">VRAM Memory</td><td class="spec-val">20 GB GDDR6</td></tr>
+            <tr><td class="spec-key">Memory Bus</td><td class="spec-val">320-bit (800 GB/s)</td></tr>
+            <tr><td class="spec-key">Stream Processors</td><td class="spec-val">5,376 Processors</td></tr>
+            <tr><td class="spec-key">FP32 Compute</td><td class="spec-val">51.6 TFLOPS</td></tr>
+            <tr><td class="spec-key">TDP Power</td><td class="spec-val">315 Watts</td></tr>
+            <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$37.45 / GB</td></tr>
+          </table>
+        </div>
+
+        <div class="card-actions">
+          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for AMD RX 7900 XT')">Inspect Specs</button>
+          <button class="btn btn-primary" onclick="addToCart('AMD RX 7900 XT')">Add to Cart</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Console Log Output -->
+    <div class="console-out" id="console-output">
+      [System] GPU Hardware Store Loaded. Ready for multi-attribute comparison query.
+    </div>
+
+  </div>
+
+  <script>
+    let cart = [];
+
+    function addToCart(gpuName) {
+      cart.push(gpuName);
+      document.getElementById('cartCount').innerText = cart.length;
+      logStoreAction(`Added '${gpuName}' to cart.`);
+    }
+
+    function logStoreAction(msg) {
+      const consoleEl = document.getElementById('console-output');
+      if (consoleEl) {
+        consoleEl.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${msg}`;
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+      }
+    }
+  </script>
+</body>
+</html>

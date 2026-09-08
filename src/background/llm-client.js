@@ -137,6 +137,28 @@ Respond ONLY with valid JSON in this exact structure:
     const activeModel = await this.getActiveModel('http://127.0.0.1:11434');
     console.log(`[Planner] Dispatching prompt to local Ollama model '${activeModel}' at ${endpoint}...`);
 
+    const payloadObject = {
+      targetEndpoint: endpoint,
+      model: activeModel,
+      userGoal: userGoal,
+      pageTitle: layoutData.title,
+      pageUrl: layoutData.url,
+      compactAxTreeSnapshot: compactAxTree,
+      actionHistory: actionHistory,
+      rawPromptDispatched: prompt,
+      timestamp: new Date().toLocaleTimeString()
+    };
+
+    try {
+      chrome.runtime.sendMessage({
+        type: 'AGENT_LLM_PAYLOAD_UPDATE',
+        payload: payloadObject
+      }).catch(() => {});
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ lastLlmPayload: payloadObject });
+      }
+    } catch (e) {}
+
     const startTime = Date.now();
     const res = await fetchWithTimeout(endpoint, {
       method: 'POST',

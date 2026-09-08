@@ -278,8 +278,29 @@ document.addEventListener('DOMContentLoaded', () => {
         currentAxNodes = message.payload.axTree.nodes;
         renderAxTree(currentAxNodes);
       }
+    } else if (message.type === 'AGENT_LLM_PAYLOAD_UPDATE') {
+      const payloadViewer = document.getElementById('llmPayloadViewer');
+      if (payloadViewer) {
+        payloadViewer.innerText = JSON.stringify(message.payload, null, 2);
+      }
     }
   });
+
+  const refreshLlmPayloadBtn = document.getElementById('refreshLlmPayloadBtn');
+  if (refreshLlmPayloadBtn) {
+    refreshLlmPayloadBtn.addEventListener('click', () => {
+      chrome.storage.local.get(['lastLlmPayload'], (res) => {
+        const payloadViewer = document.getElementById('llmPayloadViewer');
+        if (payloadViewer) {
+          if (res.lastLlmPayload) {
+            payloadViewer.innerText = JSON.stringify(res.lastLlmPayload, null, 2);
+          } else {
+            payloadViewer.innerText = 'No LLM payload recorded yet in local storage.';
+          }
+        }
+      });
+    });
+  }
 
   function renderAxTree(nodes) {
     if (!nodes || nodes.length === 0) {

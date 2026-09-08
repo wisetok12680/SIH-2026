@@ -96,6 +96,7 @@
         <div class="advanced-subnav">
           <button class="adv-subbtn active" data-subtab="subtab-ax">AX Tree</button>
           <button class="adv-subbtn" data-subtab="subtab-map">Screen Map</button>
+          <button class="adv-subbtn" data-subtab="subtab-llm">LLM Payload</button>
           <button class="adv-subbtn" data-subtab="subtab-priv">PrivScope</button>
           <button class="adv-subbtn" data-subtab="subtab-config">Settings</button>
         </div>
@@ -124,6 +125,20 @@
               <button id="refreshMapBtn" class="btn-secondary">Scan Map</button>
             </div>
             <pre class="json-viewer" id="jsonViewer"><code>Click "Scan Map" to view bounding screen layout map.</code></pre>
+          </section>
+        </div>
+
+        <!-- Subtab 3: Dispatched LLM Payload JSON -->
+        <div class="adv-subcontent" id="subtab-llm">
+          <section class="card map-card">
+            <div class="card-header">
+              <label class="card-label">Dispatched Local LLM Payload JSON</label>
+              <button id="refreshLlmPayloadBtn" class="btn-secondary">Refresh JSON</button>
+            </div>
+            <p style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">
+              Exact payload JSON dispatched to local Ollama model (<code>qwen3:4b</code>) at <code>http://127.0.0.1:11434/api/generate</code>.
+            </p>
+            <pre class="json-viewer" id="llmPayloadViewer"><code>No LLM payload dispatched yet. Run an analytical task (e.g. 'Compare GPU specs') to inspect payload JSON.</code></pre>
           </section>
         </div>
 
