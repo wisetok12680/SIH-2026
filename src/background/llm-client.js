@@ -183,18 +183,26 @@ Respond ONLY with valid JSON in this exact structure:
         const parsed = JSON.parse(cleanJsonStr);
         const targetRef = parsed.target_ref || parsed.targetRef || parsed.ref;
         return {
-          thought: `[Local ${activeModel} (${(duration / 1000).toFixed(1)}s)] ${parsed.thought || 'Action planned by local Qwen model'}`,
+          thought: parsed.thought || rawResponseText,
           action: parsed.action || (targetRef ? 'CLICK' : 'FINISH'),
           ref: targetRef,
           targetRef: targetRef,
-          value: parsed.value
+          value: parsed.value || parsed.thought || rawResponseText
         };
       }
     } catch (e) {
       console.error('[Planner] Failed to parse LLM JSON:', rawResponseText);
     }
 
-    throw new Error('LLM response did not return valid action JSON');
+    if (rawResponseText && rawResponseText.length > 5) {
+      return {
+        thought: rawResponseText,
+        action: 'FINISH',
+        value: rawResponseText
+      };
+    }
+
+    throw new Error('LLM response did not return valid output');
   }
 
   runHeuristicRefPlanner(userGoal, layoutData, actionHistory) {
