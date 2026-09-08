@@ -12,19 +12,24 @@ export async function executeAgentAction(actionPayload) {
 
   const refId = ref || targetRef;
 
-  // 1. Locate target element using Ref ID, selector, or physical coordinates
+  // 1. Locate target element using Ref ID, selector, ID, or physical coordinates
   let el = null;
 
   if (refId) {
     el = getElementByRef(refId);
+    if (!el) {
+      try {
+        const cleanRef = refId.replace(/^@/, '');
+        el = document.getElementById(cleanRef) ||
+             document.querySelector(`[id="${cleanRef}"], [name="${cleanRef}"], [name="${refId}"], [ref="${refId}"]`);
+      } catch (e) {}
+    }
   }
 
   if (!el && selector) {
     try {
       el = document.querySelector(selector);
-    } catch (e) {
-      // Fallback
-    }
+    } catch (e) {}
   }
 
   if (!el && viewportX !== undefined && viewportY !== undefined) {
@@ -62,9 +67,17 @@ export async function executeAgentAction(actionPayload) {
 
       el.focus();
       if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
-        el.value = resolvedValue;
+        const proto = el.tagName === 'INPUT' ? window.HTMLInputElement.prototype : window.HTMLTextAreaElement.prototype;
+        const nativeSetter = Object.getOwnPropertyDescriptor(proto, 'value')?.set;
+        if (nativeSetter) {
+          nativeSetter.call(el, resolvedValue);
+        } else {
+          el.value = resolvedValue;
+        }
         el.dispatchEvent(new Event('input', { bubbles: true }));
         el.dispatchEvent(new Event('change', { bubbles: true }));
+        el.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, key: 'a' }));
+        el.dispatchEvent(new KeyboardEvent('keyup', { bubbles: true, key: 'a' }));
       } else if (el.isContentEditable) {
         el.innerText = resolvedValue;
         el.dispatchEvent(new Event('input', { bubbles: true }));

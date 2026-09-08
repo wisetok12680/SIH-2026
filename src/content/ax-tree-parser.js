@@ -75,7 +75,16 @@ export function generateAXTreeSnapshot() {
 }
 
 export function getElementByRef(refId) {
-  return currentRefMap.get(refId) || null;
+  if (!refId) return null;
+  if (currentRefMap.size === 0) {
+    generateAXTreeSnapshot();
+  }
+  let el = currentRefMap.get(refId);
+  if (!el) {
+    const formatted = refId.startsWith('@') ? refId : `@${refId}`;
+    el = currentRefMap.get(formatted);
+  }
+  return el || null;
 }
 
 function getImplicitRole(el) {
