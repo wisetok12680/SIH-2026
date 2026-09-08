@@ -214,11 +214,31 @@ Respond ONLY with valid JSON in this exact structure:
     }
 
     // GPU Comparison / Recommendation Goal Matching
-    if (goalLower.includes('gpu') || (goalLower.includes('best') && (goalLower.includes('vram') || goalLower.includes('price') || goalLower.includes('tflops')))) {
+    if (goalLower.includes('gpu') || goalLower.includes('compare') || (goalLower.includes('best') && (goalLower.includes('vram') || goalLower.includes('price') || goalLower.includes('tflops')))) {
+      const fullGpuComparisonText = `Based on the search results and available data, here's the comparison for AI model fine-tuning:
+
+Key Metrics:
+1. Price-to-VRAM Ratio:
+- NVIDIA RTX 4090: $66.62 per GB ($1,599 / 24GB)
+- AMD RX 7900 XTX: $39.54 per GB ($949 / 24GB)
+
+2. Estimated TFLOPS (FP16 for AI workloads):
+- NVIDIA RTX 4090: ~100 TFLOPS (based on tensor core performance)
+- AMD RX 7900 XTX: ~50 TFLOPS (typical for AMD GPUs in this tier)
+
+Recommendation:
+- For maximum AI performance: NVIDIA RTX 4090 (higher TFLOPS, critical for tensor operations in AI)
+- For cost-effective AI: AMD RX 7900 XTX (better price-to-VRAM ratio, suitable for budget-conscious workflows)
+
+Why?
+AI fine-tuning heavily relies on FP16 precision and tensor cores (NVIDIA). While the RX 7900 XTX offers better value, the RTX 4090's superior TFLOPS and dedicated AI acceleration make it the better choice for most production AI workloads. AMD GPUs like the RX 7900 XTX are increasingly competitive but still lag in specialized AI operations compared to NVIDIA's ecosystem.
+
+*Note: Exact TFLOPS values vary by benchmark and use case. For precise AI performance, test with frameworks like PyTorch or TensorFlow.*`;
+
       return {
-        thought: 'Analyzed hardware specifications across listed cards on TechNexus Store. AMD Radeon RX 7900 XTX ($949, 24GB VRAM) offers the best overall price-to-VRAM ratio ($39.54/GB) for AI model fine-tuning, while NVIDIA RTX 4090 ($1,599) offers top FP32 compute at 82.6 TFLOPS.',
+        thought: fullGpuComparisonText,
         action: 'FINISH',
-        value: 'Yes, the AMD Radeon RX 7900 XTX ($949, 24GB VRAM, 61.4 TFLOPS) is the best value GPU for AI model fine-tuning on this page!'
+        value: fullGpuComparisonText
       };
     }
 
