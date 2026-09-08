@@ -8,7 +8,7 @@ import { AgentPlannerClient } from './llm-client.js';
 import { TrajectoryCache } from './trajectory-cache.js';
 import { HybridDynamicRouter } from './hybrid-router.js';
 
-const planner = new AgentPlannerClient('http://localhost:11434/api/generate', 'qwen:4b');
+const planner = new AgentPlannerClient('http://127.0.0.1:11434/api/generate', 'qwen3:4b');
 const router = new HybridDynamicRouter();
 
 let agentState = {
