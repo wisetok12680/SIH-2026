@@ -171,9 +171,6 @@ Respond ONLY with valid JSON in this exact structure:
     throw new Error('LLM response did not return valid action JSON');
   }
 
-    throw new Error('LLM response did not return valid action JSON');
-  }
-
   runHeuristicRefPlanner(userGoal, layoutData, actionHistory) {
     const goalLower = userGoal.toLowerCase();
     const axNodes = layoutData.axTree?.nodes || [];
