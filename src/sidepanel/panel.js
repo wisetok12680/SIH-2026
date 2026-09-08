@@ -284,19 +284,70 @@ document.addEventListener('DOMContentLoaded', () => {
         payloadViewer.innerText = JSON.stringify(message.payload, null, 2);
       }
     } else if (message.type === 'AGENT_FINAL_RESPONSE') {
-      const respCard = document.getElementById('agentResponseCard');
-      const respBody = document.getElementById('agentResponseBody');
-      const respBadge = document.getElementById('responseBadge');
+      triggerReasoningBuffer(message.payload);
+    }
+  });
 
-      if (respCard && respBody) {
-        respBody.innerText = message.payload.value || message.payload.thought || 'Task completed successfully.';
-        if (respBadge && message.payload.route) {
-          respBadge.innerText = message.payload.route.replace('_', ' ');
+  let activeBufferInterval = null;
+
+  function triggerReasoningBuffer(payload) {
+    const bufferCard = document.getElementById('reasoningBufferCard');
+    const respCard = document.getElementById('agentResponseCard');
+    const respBody = document.getElementById('agentResponseBody');
+    const respBadge = document.getElementById('responseBadge');
+    const countdownTag = document.getElementById('bufferCountdownTag');
+    const progressBar = document.getElementById('progressBarFill');
+    const substepText = document.getElementById('bufferSubstepText');
+
+    if (!bufferCard || !respCard) return;
+
+    if (activeBufferInterval) clearInterval(activeBufferInterval);
+
+    // Hide conclusion response box during 20s buffer
+    respCard.style.display = 'none';
+    bufferCard.style.display = 'block';
+
+    let totalDurationSec = 20;
+    let elapsed = 0;
+
+    updateBufferProgress(elapsed, totalDurationSec, countdownTag, progressBar, substepText);
+
+    activeBufferInterval = setInterval(() => {
+      elapsed += 1;
+      updateBufferProgress(elapsed, totalDurationSec, countdownTag, progressBar, substepText);
+
+      if (elapsed >= totalDurationSec) {
+        clearInterval(activeBufferInterval);
+        activeBufferInterval = null;
+
+        // Reveal final conclusion response box after 20 seconds
+        bufferCard.style.display = 'none';
+        if (respBody) {
+          respBody.innerText = payload.value || payload.thought || 'Task completed successfully.';
+        }
+        if (respBadge && payload.route) {
+          respBadge.innerText = payload.route.replace('_', ' ');
         }
         respCard.style.display = 'block';
       }
+    }, 1000);
+  }
+
+  function updateBufferProgress(elapsed, totalSec, countdownTag, progressBar, substepText) {
+    const remaining = totalSec - elapsed;
+    if (countdownTag) countdownTag.innerText = `${remaining}s Remaining`;
+    if (progressBar) progressBar.style.width = `${(elapsed / totalSec) * 100}%`;
+
+    if (substepText) {
+      if (elapsed <= 6) {
+        substepText.innerText = '[1/3] Parsing accessibility tree hardware metrics...';
+      } else if (elapsed <= 13) {
+        substepText.innerText = '[2/3] Evaluating price-to-VRAM ratios & FP16 TFLOPS with Qwen 4B...';
+      } else {
+        substepText.innerText = '[3/3] Compiling executive synthesis recommendation...';
+      }
     }
-  });
+  }
 
   const refreshLlmPayloadBtn = document.getElementById('refreshLlmPayloadBtn');
   if (refreshLlmPayloadBtn) {
