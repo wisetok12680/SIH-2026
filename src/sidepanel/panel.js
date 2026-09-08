@@ -283,6 +283,18 @@ document.addEventListener('DOMContentLoaded', () => {
       if (payloadViewer) {
         payloadViewer.innerText = JSON.stringify(message.payload, null, 2);
       }
+    } else if (message.type === 'AGENT_FINAL_RESPONSE') {
+      const respCard = document.getElementById('agentResponseCard');
+      const respBody = document.getElementById('agentResponseBody');
+      const respBadge = document.getElementById('responseBadge');
+
+      if (respCard && respBody) {
+        respBody.innerText = message.payload.value || message.payload.thought || 'Task completed successfully.';
+        if (respBadge && message.payload.route) {
+          respBadge.innerText = message.payload.route.replace('_', ' ');
+        }
+        respCard.style.display = 'block';
+      }
     }
   });
 

@@ -199,7 +199,17 @@ async function runAgentLoop() {
         // Save trajectory to cache upon successful multi-step completion
         await TrajectoryCache.saveTrajectory(tab.url, agentState.currentTask, agentState.actionHistory);
 
-        broadcastStatus('FINISHED', `Task completed: ${plan.value || 'Done'}`);
+        const answerText = plan.value || plan.thought || 'Task completed successfully.';
+        chrome.runtime.sendMessage({
+          type: 'AGENT_FINAL_RESPONSE',
+          payload: {
+            thought: plan.thought,
+            value: answerText,
+            route: agentState.routingMode
+          }
+        }).catch(() => {});
+
+        broadcastStatus('FINISHED', `Task completed: ${answerText}`);
         agentState.isRunning = false;
         break;
       }

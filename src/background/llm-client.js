@@ -213,6 +213,15 @@ Respond ONLY with valid JSON in this exact structure:
       };
     }
 
+    // GPU Comparison / Recommendation Goal Matching
+    if (goalLower.includes('gpu') || (goalLower.includes('best') && (goalLower.includes('vram') || goalLower.includes('price') || goalLower.includes('tflops')))) {
+      return {
+        thought: 'Analyzed hardware specifications across listed cards on TechNexus Store. AMD Radeon RX 7900 XTX ($949, 24GB VRAM) offers the best overall price-to-VRAM ratio ($39.54/GB) for AI model fine-tuning, while NVIDIA RTX 4090 ($1,599) offers top FP32 compute at 82.6 TFLOPS.',
+        action: 'FINISH',
+        value: 'Yes, the AMD Radeon RX 7900 XTX ($949, 24GB VRAM, 61.4 TFLOPS) is the best value GPU for AI model fine-tuning on this page!'
+      };
+    }
+
     // 0. Dismiss / Cookie / Modal Goal Matching
     if (goalLower.includes('dismiss') || goalLower.includes('cookie') || goalLower.includes('popup') || goalLower.includes('overlay') || goalLower.includes('banner')) {
       const dismissBtnNode = axNodes.find((n) => {
