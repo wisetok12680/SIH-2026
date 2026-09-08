@@ -20,10 +20,10 @@ export class AgentPlannerClient {
     this.detectedModel = null;
   }
 
-  async getActiveModel(baseUrl = 'http://localhost:11434') {
+  async getActiveModel(baseUrl = 'http://127.0.0.1:11434') {
     if (this.detectedModel) return this.detectedModel;
     try {
-      const res = await fetchWithTimeout(`${baseUrl}/api/tags`, {}, 800);
+      const res = await fetchWithTimeout(`${baseUrl}/api/tags`, {}, 5000);
       if (res.ok) {
         const data = await res.json();
         const models = (data.models || []).map((m) => m.name || m.model || '');
@@ -48,15 +48,15 @@ export class AgentPlannerClient {
     const { useLocalLlm = true, serverUrl } = options;
 
     if (useLocalLlm) {
-      // 1. Try Local Ollama Model on port 11434 with fast connection check
+      // 1. Try Local Ollama Model on port 11434 with 45s timeout
       try {
-        const llmResult = await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || this.apiUrl);
+        const llmResult = await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || 'http://127.0.0.1:11434/api/generate');
         if (llmResult && llmResult.action) return llmResult;
       } catch (err) {
-        console.warn('[Planner] Ollama LLM connection check timed out/offline. Checking FastAPI...', err.message);
+        console.warn('[Planner] Ollama LLM connection timed out/failed:', err.message);
       }
 
-      // 2. Try FastAPI Reasoning AI Server on port 8000 with fast connection check
+      // 2. Try FastAPI Reasoning AI Server on port 8000
       try {
         const apiResult = await this.callFastApiReasoningServer(userGoal, layoutData, actionHistory);
         if (apiResult && apiResult.action) return apiResult;
@@ -91,7 +91,7 @@ export class AgentPlannerClient {
         },
         history: actionHistory
       })
-    }, 1000);
+    }, 2000);
 
     if (!res.ok) throw new Error(`FastAPI Server returned status ${res.status}`);
     const data = await res.json();
@@ -104,7 +104,7 @@ export class AgentPlannerClient {
     };
   }
 
-  async callLocalLlm(userGoal, layoutData, actionHistory, endpoint) {
+  async callLocalLlm(userGoal, layoutData, actionHistory, endpoint = 'http://127.0.0.1:11434/api/generate') {
     const axNodes = layoutData.axTree?.nodes || [];
     const compactAxTree = axNodes.map((n) => ({
       ref: n.ref,
@@ -130,9 +130,10 @@ Respond ONLY with valid JSON in this exact structure:
   "value": "text value if typing or direction if scrolling"
 }`;
 
-    const activeModel = await this.getActiveModel('http://localhost:11434');
-    console.log(`[Planner] Calling local Ollama LLM endpoint '${endpoint}' with model '${activeModel}'...`);
+    const activeModel = await this.getActiveModel('http://127.0.0.1:11434');
+    console.log(`[Planner] Dispatching prompt to local Ollama model '${activeModel}' at ${endpoint}...`);
 
+    const startTime = Date.now();
     const res = await fetchWithTimeout(endpoint, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -141,18 +142,22 @@ Respond ONLY with valid JSON in this exact structure:
         prompt: prompt,
         stream: false
       })
-    }, 25000);
+    }, 45000);
 
     if (!res.ok) throw new Error(`LLM API returned status ${res.status}`);
     const data = await res.json();
+    const duration = Date.now() - startTime;
+    console.log(`[Planner] Local LLM '${activeModel}' responded in ${duration}ms.`);
 
+    const rawResponseText = data.response || data.thinking || '';
     try {
-      const jsonMatch = data.response.match(/\{[\s\S]*\}/);
+      const jsonMatch = rawResponseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
+        const cleanJsonStr = jsonMatch[0].replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(cleanJsonStr);
         const targetRef = parsed.target_ref || parsed.targetRef || parsed.ref;
         return {
-          thought: `[Local Qwen LLM] ${parsed.thought || 'Parsed action from local Qwen model'}`,
+          thought: `[Local ${activeModel} (${(duration / 1000).toFixed(1)}s)] ${parsed.thought || 'Action planned by local Qwen model'}`,
           action: parsed.action || (targetRef ? 'CLICK' : 'FINISH'),
           ref: targetRef,
           targetRef: targetRef,
@@ -160,8 +165,11 @@ Respond ONLY with valid JSON in this exact structure:
         };
       }
     } catch (e) {
-      console.error('[Planner] Failed to parse LLM JSON:', data.response);
+      console.error('[Planner] Failed to parse LLM JSON:', rawResponseText);
     }
+
+    throw new Error('LLM response did not return valid action JSON');
+  }
 
     throw new Error('LLM response did not return valid action JSON');
   }
