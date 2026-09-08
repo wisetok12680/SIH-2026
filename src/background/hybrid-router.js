@@ -38,18 +38,19 @@ export class HybridDynamicRouter {
       };
     }
 
-    // Rule 2: Basic routine actions (scroll, click simple button, search field) -> Local Agent
-    const isRoutineTask = /search|scroll|click|fill|type|dismiss|close/i.test(taskLower);
-    if (isRoutineTask && currentStep <= 3) {
+    // Rule 2: Form Autofill and Routine UI Tasks -> Local Agent
+    const isFormTask = /job|apply|application|form|fill|search|scroll|click|type|dismiss|close/i.test(taskLower);
+    const isHeavyAnalyticalTask = /analyze|compare|contract|compliance|risk|procurement|vendor|audit|synthesis|multi-attribute|financial|recommend/i.test(taskLower);
+
+    if (isFormTask && !isHeavyAnalyticalTask) {
       return {
         route: 'LOCAL_AGENT',
-        reason: 'On-Device Fast Execution (Routine Action)'
+        reason: 'On-Device Fast Execution (Form Autofill Task)'
       };
     }
 
     // Rule 3: Heavy Analytical Synthesis & Multi-Attribute Trade-off Reasoning -> External Cloud LLM
-    const isHeavyAnalyticalTask = /analyze|compare|contract|compliance|risk|procurement|vendor|audit|synthesis|multi-attribute|financial|recommend/i.test(taskLower);
-    if (isHeavyAnalyticalTask || currentStep > 4) {
+    if (isHeavyAnalyticalTask) {
       return {
         route: 'CLOUD_AGENT',
         reason: 'Heavy Analytical Synthesis & Contract Risk Evaluation (Exceeds Local On-Device Agent Capacity -> Dispatching Payload JSON to External LLM)'

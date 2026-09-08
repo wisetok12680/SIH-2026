@@ -344,24 +344,43 @@ async def reason_endpoint(req: ReasonRequest):
     elements = req.page_info.elements
     elements_dict = [el.dict() for el in elements]
 
+    # Parse history to prevent infinite loop on already acted elements
+    history = req.history or []
+    typed_refs = set()
+    clicked_refs = set()
+    for act in history:
+        t_ref = act.get("targetRef") or act.get("target_ref") or act.get("ref")
+        if t_ref:
+            if act.get("action") == "TYPE":
+                typed_refs.add(t_ref)
+            elif act.get("action") == "CLICK":
+                clicked_refs.add(t_ref)
+
     proposed_action = None
 
     # Check cookie / popup dismiss matching
     if any(k in prompt_lower for k in ["dismiss", "cookie", "popup", "overlay", "banner"]):
         for el in elements:
+            ref_id = el.ref or el.id
+            if ref_id and ref_id in clicked_refs:
+                continue
             name_lower = (el.name or el.text or "").lower()
             if any(term in name_lower for term in ["accept", "agree", "allow", "got it", "dismiss", "close"]):
                 proposed_action = {
-                    "thought": f"Identified cookie/modal dismiss target '{el.name or el.ref}'",
+                    "thought": f"Identified cookie/modal dismiss target '{el.name or ref_id}'",
                     "action": "CLICK",
-                    "target_ref": el.ref or el.id,
+                    "target_ref": ref_id,
                     "value": None
                 }
                 break
 
-    # Check search / fill matching
-    if not proposed_action and any(k in prompt_lower for k in ["search", "fill", "type", "enter"]):
+    # Check search / fill / form job application matching
+    if not proposed_action and any(k in prompt_lower for k in ["search", "fill", "type", "enter", "job", "application", "form"]):
         for el in elements:
+            ref_id = el.ref or el.id
+            if ref_id and ref_id in typed_refs:
+                continue
+
             if el.role in ["textbox", "searchbox"] or el.tagName in ["input", "textarea"]:
                 el_name = ((el.name or "") + " " + (el.id or "") + " " + (el.ref or "")).lower()
                 val = "Alexander Vance"
@@ -382,21 +401,49 @@ async def reason_endpoint(req: ReasonRequest):
                 elif "cover" in el_name or "letter" in el_name or "statement" in el_name: val = "Experienced AI Systems Engineer specializing in local privacy-preserving browser automation."
 
                 proposed_action = {
-                    "thought": f"Identified form input target element '{el.name or el.ref}' -> Filling '{val}'",
+                    "thought": f"Identified untyped form input target element '{el.name or ref_id}' -> Filling '{val}'",
                     "action": "TYPE",
-                    "target_ref": el.ref or el.id,
+                    "target_ref": ref_id,
                     "value": val
                 }
                 break
 
-    # Fallback to first clickable button
+        # If all input fields typed, check for unclicked terms checkbox
+        if not proposed_action:
+            for el in elements:
+                ref_id = el.ref or el.id
+                if ref_id and ref_id not in clicked_refs and (el.role == "checkbox" or getattr(el, 'type', None) == "checkbox"):
+                    proposed_action = {
+                        "thought": f"Accepting terms checkbox '{el.name or ref_id}'",
+                        "action": "CLICK",
+                        "target_ref": ref_id,
+                        "value": None
+                    }
+                    break
+
+        # Check for unclicked submit button
+        if not proposed_action:
+            for el in elements:
+                ref_id = el.ref or el.id
+                name_lower = (el.name or "").lower()
+                if ref_id and ref_id not in clicked_refs and (el.role in ["button", "link"] or el.tagName in ["button", "a"]) and ("submit" in name_lower or "apply" in name_lower):
+                    proposed_action = {
+                        "thought": f"Submitting candidate application via button '{el.name or ref_id}'",
+                        "action": "CLICK",
+                        "target_ref": ref_id,
+                        "value": None
+                    }
+                    break
+
+    # Fallback to first untyped/unclicked clickable button
     if not proposed_action:
         for el in elements:
-            if el.role in ["button", "link"] or el.tagName in ["button", "a"]:
+            ref_id = el.ref or el.id
+            if ref_id and ref_id not in clicked_refs and (el.role in ["button", "link"] or el.tagName in ["button", "a"]):
                 proposed_action = {
-                    "thought": f"Targeting primary action button '{el.name or el.ref}'",
+                    "thought": f"Targeting primary action button '{el.name or ref_id}'",
                     "action": "CLICK",
-                    "target_ref": el.ref or el.id,
+                    "target_ref": ref_id,
                     "value": None
                 }
                 break
