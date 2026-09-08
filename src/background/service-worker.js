@@ -190,7 +190,7 @@ async function runAgentLoop() {
         agentState.currentTask,
         layoutData,
         agentState.actionHistory,
-        agentState.settings
+        { ...agentState.settings, routingMode: agentState.routingMode }
       );
 
       broadcastStatus('PLAN_GENERATED', `[Step ${stepNum}] Thought: "${plan.thought}" -> Action: ${plan.action} (${plan.ref || plan.targetRef || 'N/A'})`);

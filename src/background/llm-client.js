@@ -45,27 +45,31 @@ export class AgentPlannerClient {
   }
 
   async planNextStep(userGoal, layoutData, actionHistory = [], options = {}) {
-    const { useLocalLlm = true, serverUrl } = options;
+    const { useLocalLlm = true, routingMode = 'LOCAL_AGENT', serverUrl } = options;
 
-    if (useLocalLlm) {
-      // 1. Try Local Ollama Model on port 11434 with 45s timeout
+    // 1. Routine form filling & UI interaction -> Pure In-Browser AI Engine (0ms latency, zero HTTP calls)
+    if (routingMode === 'LOCAL_AGENT') {
+      return this.runHeuristicRefPlanner(userGoal, layoutData, actionHistory);
+    }
+
+    // 2. Complex synthesis & deep reasoning -> Swappable External LLM (Local Qwen 4B / Ollama / FastAPI)
+    if (routingMode === 'EXTERNAL_LLM' || useLocalLlm) {
       try {
         const llmResult = await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || 'http://127.0.0.1:11434/api/generate');
         if (llmResult && llmResult.action) return llmResult;
       } catch (err) {
-        console.warn('[Planner] Ollama LLM connection timed out/failed:', err.message);
+        console.warn('[Planner] Swappable Ollama LLM endpoint offline/timeout:', err.message);
       }
 
-      // 2. Try FastAPI Reasoning AI Server on port 8000
       try {
         const apiResult = await this.callFastApiReasoningServer(userGoal, layoutData, actionHistory);
         if (apiResult && apiResult.action) return apiResult;
       } catch (err) {
-        console.warn('[Planner] FastAPI AI reasoning server offline. Using fast Ref decision engine...');
+        console.warn('[Planner] FastAPI reasoning server offline. Falling back to Pure In-Browser AI Engine...');
       }
     }
 
-    // 3. Fast On-Device Ref Decision Engine (Instant 0ms, 100% reliable)
+    // Fallback: Pure In-Browser Fast Engine
     return this.runHeuristicRefPlanner(userGoal, layoutData, actionHistory);
   }
 
