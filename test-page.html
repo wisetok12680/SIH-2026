@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atlas & Comet Agent - Feature Showcase Sub-Pages</title>
+  <title>Global Tech Enterprises - Candidate Application Form</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
@@ -14,10 +14,7 @@
       --card-border: #1e293b;
       --primary: #4f46e5;
       --primary-hover: #4338ca;
-      --accent-cyan: #0284c7;
       --accent-emerald: #059669;
-      --accent-amber: #d97706;
-      --accent-rose: #dc2626;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
       --input-bg: #0f172a;
@@ -31,28 +28,28 @@
       font-family: var(--font-sans);
       background: var(--bg-dark);
       color: var(--text-main);
-      padding: 24px 20px;
+      padding: 32px 20px;
       line-height: 1.6;
     }
 
     .container {
-      max-width: 1040px;
+      max-width: 920px;
       margin: 0 auto;
     }
 
-    /* Header Banner */
+    /* Page Header */
     .hero-header {
       background: #0f172a;
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 20px 24px;
-      margin-bottom: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
     }
 
     .badge-pill {
       display: inline-flex;
       align-items: center;
-      padding: 2px 10px;
+      padding: 3px 10px;
       border-radius: 4px;
       font-size: 11px;
       font-weight: 700;
@@ -61,15 +58,15 @@
       background: #312e81;
       color: #a5b4fc;
       border: 1px solid #4338ca;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
 
     .hero-title {
-      font-size: 22px;
+      font-size: 24px;
       font-weight: 700;
-      letter-spacing: -0.3px;
+      letter-spacing: -0.4px;
       color: #ffffff;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .hero-subtitle {
@@ -77,91 +74,43 @@
       font-size: 13px;
     }
 
-    /* Sub-Page Navigation Bar */
-    .subpage-nav {
-      display: flex;
-      gap: 6px;
-      background: #0f172a;
-      border: 1px solid var(--card-border);
-      padding: 6px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      overflow-x: auto;
-    }
-
-    .subpage-btn {
-      flex: 1;
-      padding: 8px 12px;
-      background: transparent;
-      border: 1px solid transparent;
-      color: var(--text-muted);
-      font-family: var(--font-sans);
-      font-size: 11px;
-      font-weight: 600;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: all 0.15s ease-in-out;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .subpage-btn:hover {
-      color: var(--text-main);
-      background: #1e293b;
-    }
-
-    .subpage-btn.active {
-      background: var(--primary);
-      color: #ffffff;
-    }
-
-    /* Sub-Page View Containers */
-    .subpage-view {
-      display: none;
-    }
-
-    .subpage-view.active {
-      display: block;
-    }
-
-    /* Card Styling */
-    .station-card {
+    /* Form Container */
+    .form-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 24px;
+      padding: 28px;
+      margin-bottom: 24px;
     }
 
-    .station-header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
+    .section-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #818cf8;
       margin-bottom: 16px;
-      padding-bottom: 12px;
+      padding-bottom: 8px;
       border-bottom: 1px solid var(--card-border);
     }
 
-    .station-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #ffffff;
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-bottom: 24px;
     }
 
-    .station-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-      margin-bottom: 20px;
-    }
-
-    /* Form Controls */
     .form-group {
-      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group.full-width {
+      grid-column: span 2;
     }
 
     .form-label {
-      display: block;
       font-size: 11px;
       font-weight: 700;
       color: var(--text-muted);
@@ -172,7 +121,7 @@
 
     .form-input {
       width: 100%;
-      padding: 9px 12px;
+      padding: 10px 14px;
       background: var(--input-bg);
       border: 1px solid var(--card-border);
       border-radius: 6px;
@@ -187,11 +136,21 @@
       border-color: var(--primary);
     }
 
+    /* Buttons */
+    .button-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      padding-top: 16px;
+      border-top: 1px solid var(--card-border);
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 9px 16px;
+      padding: 10px 20px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: 600;
@@ -206,6 +165,14 @@
       background: var(--primary-hover);
     }
 
+    .btn-submit {
+      background: var(--accent-emerald);
+    }
+
+    .btn-submit:hover {
+      background: #047857;
+    }
+
     .btn-secondary {
       background: #334155;
       color: var(--text-main);
@@ -216,62 +183,16 @@
       background: #475569;
     }
 
-    .btn-danger {
-      background: var(--accent-rose);
-    }
-
     .console-out {
       background: #030712;
       border: 1px solid var(--card-border);
-      border-radius: 6px;
-      padding: 12px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: #38bdf8;
-      max-height: 140px;
-      overflow-y: auto;
-      margin-top: 16px;
-    }
-
-    /* Overlay Box */
-    .overlay-box {
-      background: #1e293b;
-      border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 16px;
-    }
-
-    .wizard-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .wizard-step {
-      flex: 1;
-      text-align: center;
-      padding: 8px;
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 4px;
+      padding: 14px;
+      font-family: var(--font-mono);
       font-size: 12px;
-      font-weight: 600;
-      color: var(--text-muted);
-    }
-
-    .wizard-step.active {
-      background: #312e81;
-      color: #a5b4fc;
-      border-color: #4338ca;
-    }
-
-    canvas {
-      background: #030712;
-      border-radius: 6px;
-      border: 1px solid var(--card-border);
-      width: 100%;
-      max-width: 480px;
-      height: auto;
+      color: #38bdf8;
+      max-height: 160px;
+      overflow-y: auto;
     }
   </style>
 </head>
@@ -280,507 +201,158 @@
     
     <!-- Header -->
     <header class="hero-header">
-      <div class="badge-pill">ATLAS & COMET TEST LAB</div>
-      <h1 class="hero-title">Feature Showcase Sub-Pages</h1>
-      <p class="hero-subtitle">Select any sub-page below to demonstrate isolated agent capabilities in real time.</p>
+      <div class="badge-pill">CAREER PORTAL</div>
+      <h1 class="hero-title">Global Tech Enterprises - Candidate Application</h1>
+      <p class="hero-subtitle">Complete all candidate details below. The Atlas & Comet local agent will process each field agentically.</p>
     </header>
 
-    <!-- Sub-Page Navigation Bar -->
-    <nav class="subpage-nav">
-      <button class="subpage-btn active" id="btn-subpage-1" onclick="switchSubpage(1)">
-        1. AX Tree Layout
-      </button>
-      <button class="subpage-btn" id="btn-subpage-2" onclick="switchSubpage(2)">
-        2. Privacy & PII
-      </button>
-      <button class="subpage-btn" id="btn-subpage-3" onclick="switchSubpage(3)">
-        3. Visual ML Canvas
-      </button>
-      <button class="subpage-btn" id="btn-subpage-4" onclick="switchSubpage(4)">
-        4. Interrupts & CAPTCHA
-      </button>
-      <button class="subpage-btn" id="btn-subpage-5" onclick="switchSubpage(5)">
-        5. Trajectory Wizard
-      </button>
-      <button class="subpage-btn" id="btn-subpage-6" onclick="switchSubpage(6)">
-        6. Job Application Form
-      </button>
-      <button class="subpage-btn" id="btn-subpage-7" onclick="switchSubpage(7)">
-        7. Contract Risk Synthesis
-      </button>
-    </nav>
-
-    <!-- SUB-PAGE 1: AX Tree Layout & Reference IDs -->
-    <div class="subpage-view active" id="subpage-1">
-      <div class="station-card">
-        <div class="station-header">
-          <div>
-            <div class="station-title">Sub-Page 1: AX Tree & Bounding Screen Map</div>
-            <div class="station-desc">Test layout extraction, element boundary detection, and ARIA reference tagging (@e1, @e2...).</div>
-          </div>
+    <!-- Job Application Form -->
+    <form class="form-card" id="jobAppForm" onsubmit="event.preventDefault(); submitApplication();">
+      
+      <!-- Section 1: Personal Information -->
+      <div class="section-title">1. Personal Information</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="jobFullName" class="form-label">Full Name</label>
+          <input type="text" id="jobFullName" class="form-input" placeholder="e.g. Alexander Vance" required />
         </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div>
-            <div class="form-group">
-              <label for="searchQueryInput" class="form-label">Search Query Target Input</label>
-              <input type="text" id="searchQueryInput" class="form-input" placeholder="Type search term..." value="Local Agent Architecture" />
-            </div>
-            <div class="form-group">
-              <label for="categorySelect" class="form-label">Category Dropdown</label>
-              <select id="categorySelect" class="form-input">
-                <option value="ai">Artificial Intelligence</option>
-                <option value="privacy">Privacy & Security</option>
-                <option value="ml">Machine Learning</option>
-              </select>
-            </div>
-            <button class="btn" id="submitSearchBtn" onclick="logConsole('Search query submitted successfully.')">
-              Submit Search Action
-            </button>
-          </div>
-
-          <div>
-            <div class="form-group">
-              <label class="form-label">Interactive Controls</label>
-              <div style="display: flex; gap: 10px; margin-bottom: 12px;">
-                <label style="font-size: 13px; cursor: pointer;">
-                  <input type="checkbox" id="chk1" checked /> Enable PrivScope Filter
-                </label>
-              </div>
-              <div style="display: flex; gap: 10px;">
-                <button class="btn btn-secondary" onclick="logConsole('Action Button A Clicked')">Action A</button>
-                <button class="btn btn-secondary" onclick="logConsole('Action Button B Clicked')">Action B</button>
-              </div>
-            </div>
-          </div>
+        <div class="form-group">
+          <label for="jobEmail" class="form-label">Email Address</label>
+          <input type="email" id="jobEmail" class="form-input" placeholder="e.g. alex.vance@privacy.org" required />
         </div>
-
-        <div class="console-out" id="console-subpage-1">
-          [System] Sub-Page 1 active. Use extension sidepanel to scan AX Tree refs (@e1, @e2...).
+        <div class="form-group">
+          <label for="jobPhone" class="form-label">Phone Number</label>
+          <input type="text" id="jobPhone" class="form-input" placeholder="e.g. +1 (555) 892-1243" required />
+        </div>
+        <div class="form-group">
+          <label for="jobCity" class="form-label">Current City / Location</label>
+          <input type="text" id="jobCity" class="form-input" placeholder="e.g. San Francisco, CA" />
+        </div>
+        <div class="form-group">
+          <label for="jobLinkedin" class="form-label">LinkedIn Profile URL</label>
+          <input type="text" id="jobLinkedin" class="form-input" placeholder="e.g. https://linkedin.com/in/alexandervance" />
+        </div>
+        <div class="form-group">
+          <label for="jobPortfolio" class="form-label">GitHub / Portfolio URL</label>
+          <input type="text" id="jobPortfolio" class="form-input" placeholder="e.g. https://github.com/wisetok12680" />
         </div>
       </div>
-    </div>
 
-    <!-- SUB-PAGE 2: PII Redaction & PrivScope -->
-    <div class="subpage-view" id="subpage-2">
-      <div class="station-card">
-        <div class="station-header">
-          <div>
-            <div class="station-title">Sub-Page 2: Privacy Preserving Filter & PrivScope</div>
-            <div class="station-desc">Demonstrates client-side PII regex masking and on-device hardware table binding ($BIND_).</div>
-          </div>
+      <!-- Section 2: Professional Background -->
+      <div class="section-title">2. Professional Background</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="jobRole" class="form-label">Current / Desired Job Title</label>
+          <input type="text" id="jobRole" class="form-input" placeholder="e.g. AI Systems Engineer" />
         </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div>
-            <div class="form-group">
-              <label for="userEmail" class="form-label">Email Address</label>
-              <input type="email" id="userEmail" class="form-input" value="john.doe@privacy.org" oninput="updatePiiPreview()" />
-            </div>
-            <div class="form-group">
-              <label for="userPhone" class="form-label">Phone Number</label>
-              <input type="text" id="userPhone" class="form-input" value="+1 (555) 234-5678" oninput="updatePiiPreview()" />
-            </div>
-            <div class="form-group">
-              <label for="userCreditCard" class="form-label">Credit Card Number</label>
-              <input type="text" id="userCreditCard" class="form-input" value="4532 7182 9384 1029" oninput="updatePiiPreview()" />
-            </div>
-          </div>
-
-          <div>
-            <div class="form-group">
-              <label for="userSsn" class="form-label">US SSN / Tax ID</label>
-              <input type="text" id="userSsn" class="form-input" value="123-45-6789" oninput="updatePiiPreview()" />
-            </div>
-            <div class="form-group">
-              <label for="userPan" class="form-label">Indian PAN Card Number</label>
-              <input type="text" id="userPan" class="form-input" value="ABCDE1234F" oninput="updatePiiPreview()" />
-            </div>
-            <div class="form-group">
-              <label class="form-label">Live Client Sanitized Preview</label>
-              <div id="piiPreviewBox" style="background: #030712; border: 1px solid var(--card-border); padding: 10px; border-radius: 6px; font-family: var(--font-mono); font-size: 12px; color: #10b981;">
-                Initializing PII preview...
-              </div>
-            </div>
-          </div>
+        <div class="form-group">
+          <label for="jobExperience" class="form-label">Years of Experience</label>
+          <input type="text" id="jobExperience" class="form-input" placeholder="e.g. 5" />
         </div>
-
-        <div class="console-out" id="console-subpage-2">
-          [System] Sub-Page 2 active. Raw PII data is masked on-device prior to any external cloud requests.
+        <div class="form-group">
+          <label for="jobEmployer" class="form-label">Current Employer / Company</label>
+          <input type="text" id="jobEmployer" class="form-input" placeholder="e.g. Privacy AI Labs" />
+        </div>
+        <div class="form-group">
+          <label for="jobNotice" class="form-label">Notice Period (Days)</label>
+          <input type="text" id="jobNotice" class="form-input" placeholder="e.g. 30" />
+        </div>
+        <div class="form-group">
+          <label for="jobSalary" class="form-label">Expected Salary ($ / yr)</label>
+          <input type="text" id="jobSalary" class="form-input" placeholder="e.g. 140,000" />
+        </div>
+        <div class="form-group">
+          <label for="jobSkills" class="form-label">Primary Technical Skills</label>
+          <input type="text" id="jobSkills" class="form-input" placeholder="e.g. Python, PyTorch, Node.js, WebGPU" />
         </div>
       </div>
-    </div>
 
-    <!-- SUB-PAGE 3: Visual ML & Canvas OCR -->
-    <div class="subpage-view" id="subpage-3">
-      <div class="station-card">
-        <div class="station-header">
-          <div>
-            <div class="station-title">Sub-Page 3: Visual ML Inspection (YOLO + EasyOCR)</div>
-            <div class="station-desc">Parses non-DOM graphics, embedded charts, and canvas elements using visual ML.</div>
-          </div>
+      <!-- Section 3: Education & Additional Info -->
+      <div class="section-title">3. Education & Work Authorization</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="jobDegree" class="form-label">Highest Degree Obtained</label>
+          <input type="text" id="jobDegree" class="form-input" placeholder="e.g. Master of Science in Computer Science" />
         </div>
-
-        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-          <div>
-            <canvas id="chartCanvas" width="480" height="220"></canvas>
-          </div>
-          <div style="flex: 1; min-width: 260px;">
-            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">
-              Standard DOM tree inspection cannot read pixels inside HTML5 Canvas. Our visual ML server runs YOLOv8-nano UI bounding and PP-OCR text extraction.
-            </p>
-            <button class="btn" onclick="drawCanvasGraph()">Redraw Canvas Data</button>
-          </div>
+        <div class="form-group">
+          <label for="jobUniversity" class="form-label">University / Institution</label>
+          <input type="text" id="jobUniversity" class="form-input" placeholder="e.g. Stanford University" />
         </div>
-
-        <div class="console-out" id="console-subpage-3">
-          [System] Sub-Page 3 active. Canvas chart rendered.
+        <div class="form-group">
+          <label for="jobReferral" class="form-label">How did you hear about us?</label>
+          <select id="jobReferral" class="form-input">
+            <option value="linkedin">LinkedIn Jobs</option>
+            <option value="referral">Employee Referral</option>
+            <option value="website">Company Career Site</option>
+            <option value="other">Other</option>
+          </select>
         </div>
-      </div>
-    </div>
-
-    <!-- SUB-PAGE 4: Interrupts & CAPTCHA Pause -->
-    <div class="subpage-view" id="subpage-4">
-      <div class="station-card">
-        <div class="station-header">
-          <div>
-            <div class="station-title">Sub-Page 4: Overlays, Cookie Banners & CAPTCHA Pause</div>
-            <div class="station-desc">Tests auto-dismissal of cookie consent overlays and automated CAPTCHA challenge pause/resume.</div>
-          </div>
-        </div>
-
-        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
-          <button class="btn btn-secondary" onclick="toggleCookieOverlay(true)">Show Cookie Overlay Banner</button>
-          <button class="btn btn-danger" onclick="toggleCaptchaWidget(true)">Trigger CAPTCHA Challenge</button>
-        </div>
-
-        <!-- CAPTCHA Simulation Widget -->
-        <div id="captchaSimWidget" style="display: none; background: #4c0519; border: 1px solid #9f1239; border-radius: 8px; padding: 16px; margin-bottom: 16px;">
-          <div style="display: flex; align-items: center; justify-content: space-between;">
-            <div>
-              <strong style="color: #fb7185; font-size: 13px;">Cloudflare Turnstile CAPTCHA Widget Challenge</strong>
-              <p style="font-size: 12px; color: #fecdd3;">Simulates an active CAPTCHA challenge triggering agent pause.</p>
-            </div>
-            <button class="btn" onclick="toggleCaptchaWidget(false)" style="background: #059669;">Resolve CAPTCHA</button>
-          </div>
-          <iframe title="reCAPTCHA challenge simulation" src="about:blank" style="width: 100%; height: 60px; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; border-radius: 4px;"></iframe>
-        </div>
-
-        <div class="console-out" id="console-subpage-4">
-          [System] Sub-Page 4 active. Click buttons above to trigger popups or CAPTCHA challenges.
+        <div class="form-group">
+          <label for="jobWorkAuth" class="form-label">Work Authorization Status</label>
+          <select id="jobWorkAuth" class="form-input">
+            <option value="authorized">Authorized to work full-time</option>
+            <option value="sponsorship">Require Visa Sponsorship</option>
+            <option value="citizen">US / EU Citizen</option>
+          </select>
         </div>
       </div>
-    </div>
 
-    <!-- SUB-PAGE 5: Multi-Step Trajectory Wizard -->
-    <div class="subpage-view" id="subpage-5">
-      <div class="station-card">
-        <div class="station-header">
-          <div>
-            <div class="station-title">Sub-Page 5: Multi-Step Wizard & 0ms Trajectory Cache</div>
-            <div class="station-desc">Validates multi-step form completion and instant 0ms AI bypass trajectory replay.</div>
-          </div>
-        </div>
-
-        <div class="wizard-tabs">
-          <div class="wizard-step active" id="wizTab1">Step 1: Account</div>
-          <div class="wizard-step" id="wizTab2">Step 2: Verification</div>
-          <div class="wizard-step" id="wizTab3">Step 3: Confirmation</div>
-        </div>
-
-        <!-- Step 1 -->
-        <div id="wizStep1Content">
-          <div class="form-group">
-            <label for="wizUsername" class="form-label">Account Username</label>
-            <input type="text" id="wizUsername" class="form-input" value="agent_tester_01" />
-          </div>
-          <button class="btn" id="nextToStep2Btn" onclick="goToWizStep(2)">Proceed to Step 2 →</button>
-        </div>
-
-        <!-- Step 2 -->
-        <div id="wizStep2Content" style="display: none;">
-          <div class="form-group">
-            <label for="wizPin" class="form-label">Security PIN Code</label>
-            <input type="password" id="wizPin" class="form-input" value="9876" />
-          </div>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn btn-secondary" onclick="goToWizStep(1)">← Back</button>
-            <button class="btn" id="nextToStep3Btn" onclick="goToWizStep(3)">Proceed to Confirmation →</button>
-          </div>
-        </div>
-
-        <!-- Step 3 -->
-        <div id="wizStep3Content" style="display: none;">
-          <p style="font-size: 13px; color: #10b981; margin-bottom: 12px;">
-            All wizard steps validated! Click complete to save trajectory into local storage.
-          </p>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn btn-secondary" onclick="goToWizStep(2)">← Back</button>
-            <button class="btn" id="finishWizardBtn" onclick="finishWizardTrajectory()">Complete & Cache Trajectory</button>
-          </div>
-        </div>
-
-        <div class="console-out" id="console-subpage-5">
-          [System] Sub-Page 5 active. Ready for wizard trajectory execution.
+      <!-- Section 4: Cover Letter Summary -->
+      <div class="section-title">4. Personal Statement</div>
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="jobCoverLetter" class="form-label">Cover Letter Summary</label>
+          <textarea id="jobCoverLetter" class="form-input" rows="3" placeholder="Tell us about your technical background, accomplishments, and career goals..."></textarea>
         </div>
       </div>
-    </div>
 
-    <!-- SUB-PAGE 6: Agentic Job Application Form -->
-    <div class="subpage-view" id="subpage-6">
-      <div class="station-card">
-        <div class="station-header">
-          <div>
-            <div class="station-title">Sub-Page 6: Agentic Job Application Form</div>
-            <div class="station-desc">Automated candidate application form filling. Type "Fill job application form" in sidepanel!</div>
-          </div>
-        </div>
-
-        <form id="jobAppForm" onsubmit="event.preventDefault(); submitJobApplication();" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-          <div>
-            <div class="form-group">
-              <label for="jobFullName" class="form-label">Full Name</label>
-              <input type="text" id="jobFullName" class="form-input" placeholder="e.g. Alexander Vance" />
-            </div>
-            <div class="form-group">
-              <label for="jobEmail" class="form-label">Email Address</label>
-              <input type="email" id="jobEmail" class="form-input" placeholder="e.g. alex.vance@privacy.org" />
-            </div>
-            <div class="form-group">
-              <label for="jobPhone" class="form-label">Phone Number</label>
-              <input type="text" id="jobPhone" class="form-input" placeholder="e.g. +1 (555) 892-1243" />
-            </div>
-          </div>
-
-          <div>
-            <div class="form-group">
-              <label for="jobExperience" class="form-label">Years of Experience</label>
-              <input type="text" id="jobExperience" class="form-input" placeholder="e.g. 5" />
-            </div>
-            <div class="form-group">
-              <label for="jobPortfolio" class="form-label">GitHub / Portfolio URL</label>
-              <input type="text" id="jobPortfolio" class="form-input" placeholder="e.g. https://github.com/wisetok12680" />
-            </div>
-            <div class="form-group">
-              <label for="jobCoverLetter" class="form-label">Cover Letter Summary</label>
-              <textarea id="jobCoverLetter" class="form-input" rows="2" placeholder="Tell us about your background..."></textarea>
-            </div>
-          </div>
-
-          <div style="grid-column: span 2; display: flex; align-items: center; justify-content: space-between; margin-top: 8px;">
-            <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 8px;">
-              <input type="checkbox" id="jobPrivacyCheck" /> I agree to data privacy terms & PrivScope local encryption.
-            </label>
-            <button type="submit" class="btn" id="submitJobAppBtn" style="background: #059669;">
-              Submit Application
-            </button>
-          </div>
-        </form>
-
-        <div class="console-out" id="console-subpage-6">
-          [System] Sub-Page 6 active. Ready for autonomous agent job application filling.
-        </div>
+      <!-- Section 5: Terms & Action Buttons -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
+        <input type="checkbox" id="jobPrivacyCheck" style="cursor: pointer;" />
+        <label for="jobPrivacyCheck" style="font-size: 13px; cursor: pointer;">
+          I agree to data processing terms and local PrivScope hardware encryption.
+        </label>
       </div>
-    </div>
 
-    <!-- SUB-PAGE 7: Heavy Analytical Synthesis & Financial Contract Risk Matrix -->
-    <div class="subpage-view" id="subpage-7">
-      <div class="station-card">
-        <div class="station-header">
-          <div>
-            <div class="station-title">Sub-Page 7: Enterprise Contract Compliance & Financial Risk Matrix</div>
-            <div class="station-desc">Heavy analytical synthesis lab. Exceeds local agent capacity -> triggers cloud LLM JSON payload dispatching.</div>
-          </div>
-        </div>
-
-        <div style="overflow-x: auto; margin-bottom: 20px;">
-          <table style="width: 100%; border-collapse: collapse; font-size: 13px; text-align: left;">
-            <thead>
-              <tr style="background: #0f172a; border-bottom: 2px solid var(--card-border);">
-                <th style="padding: 10px; color: var(--text-muted);">Vendor Name</th>
-                <th style="padding: 10px; color: var(--text-muted);">SLA Guarantee</th>
-                <th style="padding: 10px; color: var(--text-muted);">Annual Cost</th>
-                <th style="padding: 10px; color: var(--text-muted);">Penalty Clause</th>
-                <th style="padding: 10px; color: var(--text-muted);">Compliance Score</th>
-                <th style="padding: 10px; color: var(--text-muted);">Audit Flag</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr style="border-bottom: 1px solid var(--card-border);">
-                <td style="padding: 10px; font-weight: 600;">Apex Cloud Systems</td>
-                <td style="padding: 10px;">99.9% Availability</td>
-                <td style="padding: 10px;">$480,000 / yr</td>
-                <td style="padding: 10px;">5% SLA Credit</td>
-                <td style="padding: 10px; color: #f59e0b; font-weight: 600;">88%</td>
-                <td style="padding: 10px; color: #f87171;">High Overage Rate</td>
-              </tr>
-              <tr style="border-bottom: 1px solid var(--card-border); background: rgba(5, 150, 105, 0.08);">
-                <td style="padding: 10px; font-weight: 600; color: #34d399;">Sentinel Cyber Solutions</td>
-                <td style="padding: 10px;">99.99% Availability</td>
-                <td style="padding: 10px;">$620,000 / yr</td>
-                <td style="padding: 10px;">15% SLA Credit</td>
-                <td style="padding: 10px; color: #34d399; font-weight: 600;">96%</td>
-                <td style="padding: 10px; color: #34d399;">Recommended Tier-1</td>
-              </tr>
-              <tr style="border-bottom: 1px solid var(--card-border);">
-                <td style="padding: 10px; font-weight: 600;">Global Tech Infra</td>
-                <td style="padding: 10px;">98.5% Availability</td>
-                <td style="padding: 10px;">$390,000 / yr</td>
-                <td style="padding: 10px;">None (No Penalty)</td>
-                <td style="padding: 10px; color: #ef4444; font-weight: 600;">72%</td>
-                <td style="padding: 10px; color: #ef4444;">SLA Breach Exposure</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div style="display: flex; gap: 12px;">
-          <button class="btn" id="btn-gen-report" onclick="generateContractReport()">
-            Generate Executive Risk Analysis Report
-          </button>
-          <button class="btn btn-secondary" id="btn-approve-sentinel" onclick="logConsole('Approved Sentinel Cyber Contract ($620,000/yr).')">
-            Approve Sentinel Cyber Contract
-          </button>
-        </div>
-
-        <div class="console-out" id="console-subpage-7">
-          [System] Sub-Page 7 active. Heavy multi-attribute enterprise matrix loaded.
-        </div>
+      <div class="button-row">
+        <button type="button" class="btn btn-secondary" onclick="resetForm()">
+          Reset Form Fields
+        </button>
+        <button type="submit" class="btn btn-submit" id="submitJobAppBtn">
+          Submit Candidate Application
+        </button>
       </div>
+    </form>
+
+    <!-- Real-time Console Log Output -->
+    <div class="console-out" id="console-output">
+      [System] Enterprise Candidate Application Portal Loaded. Ready for agentic form filling.
     </div>
 
-  </div>
-
-  <!-- Cookie Modal Overlay -->
-  <div class="overlay-box" id="cookieBannerOverlay" style="position: fixed; bottom: 20px; right: 20px; max-width: 380px; z-index: 9999; display: none;">
-    <p style="font-size: 13px; color: white; margin-bottom: 10px;">
-      <strong>Cookie & Privacy Consent:</strong> We use cookies to enhance testing performance.
-    </p>
-    <div style="display: flex; gap: 8px;">
-      <button class="btn" id="acceptAllCookiesBtn" onclick="toggleCookieOverlay(false)" style="font-size: 12px; padding: 6px 12px;">Accept All Cookies</button>
-      <button class="btn btn-secondary" onclick="toggleCookieOverlay(false)" style="font-size: 12px; padding: 6px 12px;">Got It</button>
-    </div>
   </div>
 
   <script>
-    // Sub-Page Navigation Switcher
-    function switchSubpage(num) {
-      document.querySelectorAll('.subpage-view').forEach(view => view.classList.remove('active'));
-      document.querySelectorAll('.subpage-btn').forEach(btn => btn.classList.remove('active'));
+    function submitApplication() {
+      const name = document.getElementById('jobFullName').value || 'Alexander Vance';
+      const email = document.getElementById('jobEmail').value || 'alex.vance@privacy.org';
+      const role = document.getElementById('jobRole').value || 'AI Engineer';
 
-      const targetView = document.getElementById(`subpage-${num}`);
-      const targetBtn = document.getElementById(`btn-subpage-${num}`);
+      logConsole(`APPLICATION SUBMITTED SUCCESSFULLY! Candidate: ${name} (${role}) | Email: ${email}`);
+      alert(`Application Submitted Successfully!\n\nCandidate: ${name}\nRole: ${role}\nEmail: ${email}\nStatus: Processed by Atlas & Comet Agent!`);
+    }
 
-      if (targetView) targetView.classList.add('active');
-      if (targetBtn) targetBtn.classList.add('active');
-
-      logConsole(`Switched to Sub-Page ${num}`);
-      if (num === 3) drawCanvasGraph();
-      if (num === 2) updatePiiPreview();
+    function resetForm() {
+      document.getElementById('jobAppForm').reset();
+      logConsole('Form fields reset to empty state.');
     }
 
     function logConsole(msg) {
-      const activeConsole = document.querySelector('.subpage-view.active .console-out') || document.getElementById('console-subpage-1');
-      if (activeConsole) {
-        activeConsole.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${msg}`;
-        activeConsole.scrollTop = activeConsole.scrollHeight;
+      const consoleEl = document.getElementById('console-output');
+      if (consoleEl) {
+        consoleEl.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${msg}`;
+        consoleEl.scrollTop = consoleEl.scrollHeight;
       }
     }
-
-    // Sub-Page 2: PII Redaction Live Preview
-    function updatePiiPreview() {
-      const email = document.getElementById('userEmail')?.value || '';
-      const phone = document.getElementById('userPhone')?.value || '';
-      const card = document.getElementById('userCreditCard')?.value || '';
-      const ssn = document.getElementById('userSsn')?.value || '';
-      const pan = document.getElementById('userPan')?.value || '';
-
-      let combined = `Email: ${email} | Phone: ${phone} | Card: ${card} | SSN: ${ssn} | PAN: ${pan}`;
-
-      combined = combined.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[REDACTED_EMAIL]');
-      combined = combined.replace(/(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/g, '[REDACTED_PHONE]');
-      combined = combined.replace(/\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13})\b/g, '[REDACTED_CARD]');
-      combined = combined.replace(/\b\d{3}-\d{2}-\d{4}\b/g, '[REDACTED_SSN]');
-      combined = combined.replace(/\b[A-Z]{5}[0-9]{4}[A-Z]{1}\b/g, '[REDACTED_PAN]');
-
-      const piiBox = document.getElementById('piiPreviewBox');
-      if (piiBox) piiBox.innerText = combined;
-    }
-
-    // Sub-Page 3: Canvas Graph Renderer
-    function drawCanvasGraph() {
-      const canvas = document.getElementById('chartCanvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = '#030712';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.beginPath();
-      ctx.moveTo(20, 150);
-      ctx.lineTo(100, 90);
-      ctx.lineTo(200, 130);
-      ctx.lineTo(320, 40);
-      ctx.lineTo(440, 70);
-      ctx.strokeStyle = '#4f46e5';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      ctx.fillStyle = '#38bdf8';
-      ctx.font = '600 15px Inter, sans-serif';
-      ctx.fillText('YOLO + PP-OCR Node Target: $84,920', 30, 40);
-    }
-
-    // Sub-Page 4: Interrupts & CAPTCHA
-    function toggleCookieOverlay(show) {
-      const el = document.getElementById('cookieBannerOverlay');
-      if (el) el.style.display = show ? 'block' : 'none';
-      logConsole(show ? 'Cookie Overlay Rendered' : 'Cookie Banner Dismissed');
-    }
-
-    function toggleCaptchaWidget(show) {
-      const el = document.getElementById('captchaSimWidget');
-      if (el) el.style.display = show ? 'block' : 'none';
-      logConsole(show ? 'CAPTCHA Challenge Widget Activated!' : 'CAPTCHA Challenge Resolved!');
-    }
-
-    // Sub-Page 5: Wizard Logic
-    function goToWizStep(step) {
-      document.getElementById('wizStep1Content').style.display = step === 1 ? 'block' : 'none';
-      document.getElementById('wizStep2Content').style.display = step === 2 ? 'block' : 'none';
-      document.getElementById('wizStep3Content').style.display = step === 3 ? 'block' : 'none';
-
-      document.getElementById('wizTab1').className = `wizard-step ${step === 1 ? 'active' : ''}`;
-      document.getElementById('wizTab2').className = `wizard-step ${step === 2 ? 'active' : ''}`;
-      document.getElementById('wizTab3').className = `wizard-step ${step === 3 ? 'active' : ''}`;
-
-      logConsole(`Wizard Navigated to Step ${step}`);
-    }
-
-    function finishWizardTrajectory() {
-      logConsole('Wizard Trajectory Completed & Cached locally!');
-    }
-
-    // Sub-Page 6: Job Application Submission
-    function submitJobApplication() {
-      const name = document.getElementById('jobFullName')?.value || 'Alexander Vance';
-      const role = document.getElementById('jobExperience')?.value || '5 years';
-      logConsole(`JOB APPLICATION SUBMITTED SUCCESSFULLY! Candidate: ${name} (${role} experience)`);
-      alert(`Application Submitted Successfully!\nCandidate: ${name}\nStatus: Processed Agentically by Atlas & Comet!`);
-    }
-
-    // Sub-Page 7: Heavy Analytical Report Generator
-    function generateContractReport() {
-      logConsole('HEAVY CONTRACT SYNTHESIS EXECUTED! Cloud LLM evaluated 3 vendors. Recommendation: Sentinel Cyber Solutions (99.99% SLA, 96% compliance).');
-      alert('Executive Risk Analysis Report Generated!\n\nCloud LLM Recommendation: Sentinel Cyber Solutions\nReasoning: 99.99% SLA Uptime, 15% SLA penalty credit clause, 96% compliance score.');
-    }
-
-    // Initialize
-    window.addEventListener('load', () => {
-      drawCanvasGraph();
-      updatePiiPreview();
-    });
   </script>
 </body>
 </html>

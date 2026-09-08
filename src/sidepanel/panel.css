@@ -230,6 +230,51 @@ body {
   display: flex;
 }
 
+/* Advanced Sub-Navigation */
+.advanced-subnav {
+  display: flex;
+  gap: 4px;
+  background: #0f172a;
+  border: 1px solid var(--card-border);
+  padding: 4px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.adv-subbtn {
+  flex: 1;
+  padding: 6px 4px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.adv-subbtn:hover {
+  color: #ffffff;
+  background: #1e293b;
+}
+
+.adv-subbtn.active {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.adv-subcontent {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.adv-subcontent.active {
+  display: flex;
+}
+
 /* Card Component */
 .card {
   background: var(--card-bg);

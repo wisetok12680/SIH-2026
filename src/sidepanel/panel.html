@@ -28,6 +28,16 @@
       </div>
     </header>
 
+    <!-- Navigation Bar: Front Chat vs Advanced Tools -->
+    <nav class="side-nav">
+      <button class="nav-btn active" data-tab="tab-control">
+        <span class="nav-label">CHAT & LOGS</span>
+      </button>
+      <button class="nav-btn" data-tab="tab-advanced">
+        <span class="nav-label">ADVANCED TOOLS</span>
+      </button>
+    </nav>
+
     <!-- CAPTCHA Alert Banner (Hidden by default) -->
     <div class="captcha-banner" id="captchaBanner" style="display: none;">
       <div class="captcha-icon">!</div>
@@ -37,135 +47,115 @@
       </div>
     </div>
 
-    <!-- Main Workspace with Vertical Side Navigation -->
-    <div class="workspace-layout">
+    <!-- Main Workspace -->
+    <div class="main-content-area">
 
-      <!-- Vertical Side Navigation Panel -->
-      <nav class="side-nav">
-        <button class="nav-btn active" data-tab="tab-control" title="Control Center">
-          <span class="nav-label">CONTROL</span>
-        </button>
-        <button class="nav-btn" data-tab="tab-ax" title="Accessibility Ref Tree">
-          <span class="nav-label">AX TREE</span>
-        </button>
-        <button class="nav-btn" data-tab="tab-map" title="Physical Bounding Map">
-          <span class="nav-label">MAP</span>
-        </button>
-        <button class="nav-btn" data-tab="tab-privscope" title="PrivScope Protection">
-          <span class="nav-label">PRIVACY</span>
-        </button>
-        <button class="nav-btn" data-tab="tab-settings" title="Engine Settings">
-          <span class="nav-label">CONFIG</span>
-        </button>
-      </nav>
+      <!-- FRONT PAGE VIEW: Chat & Live Logs -->
+      <main class="tab-content active" id="tab-control">
+        <section class="card input-card">
+          <div class="card-header">
+            <label for="taskPrompt" class="card-label">Task Goal & Instructions</label>
+            <span class="cache-indicator" id="cacheHitIndicator" style="display: none;">Fast Replay Ready</span>
+          </div>
+          <textarea 
+            id="taskPrompt" 
+            class="task-textarea" 
+            placeholder="Enter task goal (e.g., 'Fill out job application form')..."
+            rows="3"
+          >Fill job application form</textarea>
+          
+          <!-- Equal Width Action Buttons -->
+          <div class="button-group-floating">
+            <button id="startAgentBtn" class="btn btn-primary btn-equal">
+              Start Task
+            </button>
+            <button id="stopAgentBtn" class="btn btn-danger btn-equal" disabled>
+              Stop
+            </button>
+          </div>
+        </section>
 
-      <!-- Main Content Area -->
-      <div class="main-content-area">
-
-        <!-- Tab 1: Control Center -->
-        <main class="tab-content active" id="tab-control">
-          <section class="card input-card">
-            <div class="card-header">
-              <label for="taskPrompt" class="card-label">Task Goal & Instructions</label>
-              <span class="cache-indicator" id="cacheHitIndicator" style="display: none;">Fast Replay Ready</span>
+        <!-- Primary Live Execution Log Timeline -->
+        <section class="card log-card" style="flex: 1; display: flex; flex-direction: column;">
+          <div class="card-header">
+            <label class="card-label">Live Trajectory Timeline</label>
+            <button id="clearLogsBtn" class="btn-text">Clear</button>
+          </div>
+          <div class="log-container" id="logContainer" style="flex: 1; min-height: 280px;">
+            <div class="log-entry log-info">
+              <span class="log-time">[System]</span> Atlas & Comet Agent Ready. Qwen LLM & PrivScope active.
             </div>
-            <textarea 
-              id="taskPrompt" 
-              class="task-textarea" 
-              placeholder="Enter task goal or instruction..."
-              rows="3"
-            ></textarea>
-            
-            <!-- Equal Width Floating Action Buttons -->
-            <div class="button-group-floating">
-              <button id="startAgentBtn" class="btn btn-primary btn-equal">
-                Start Task
-              </button>
-              <button id="stopAgentBtn" class="btn btn-danger btn-equal" disabled>
-                Stop
-              </button>
-            </div>
-          </section>
+          </div>
+        </section>
+      </main>
 
-          <!-- Live Execution Log -->
-          <section class="card log-card">
-            <div class="card-header">
-              <label class="card-label">Live Trajectory Timeline</label>
-              <button id="clearLogsBtn" class="btn-text">Clear</button>
-            </div>
-            <div class="log-container" id="logContainer">
-              <div class="log-entry log-info">
-                <span class="log-time">[System]</span> Atlas & Comet Agent Ready. PrivScope active.
-              </div>
-            </div>
-          </section>
-        </main>
+      <!-- ADVANCED SECTION VIEW: AX Tree, Map, Privacy, Config -->
+      <main class="tab-content" id="tab-advanced">
+        
+        <!-- Advanced Section Tabs -->
+        <div class="advanced-subnav">
+          <button class="adv-subbtn active" data-subtab="subtab-ax">AX Tree</button>
+          <button class="adv-subbtn" data-subtab="subtab-map">Screen Map</button>
+          <button class="adv-subbtn" data-subtab="subtab-priv">PrivScope</button>
+          <button class="adv-subbtn" data-subtab="subtab-config">Settings</button>
+        </div>
 
-        <!-- Tab 2: Accessibility Ref Tree (@e1, @e2...) -->
-        <main class="tab-content" id="tab-ax">
+        <!-- Subtab 1: Accessibility Ref Tree -->
+        <div class="adv-subcontent active" id="subtab-ax">
           <section class="card map-card">
             <div class="card-header">
-              <label class="card-label">Accessibility Tree Refs Snapshot</label>
+              <label class="card-label">Accessibility Tree Snapshot (@e1, @e2...)</label>
               <button id="scanAxBtn" class="btn-secondary">Scan Tree</button>
             </div>
-            <p class="card-desc">Interactive accessibility nodes tagged with stable Reference IDs (@e1, @e2...)</p>
-            
-            <div class="search-box">
-              <input type="text" id="axSearchInput" placeholder="Filter by Ref (@e1), tag, or text..." />
+            <div class="search-box" style="margin-bottom: 10px;">
+              <input type="text" id="axSearchInput" placeholder="Filter by Ref (@e1), role, or label..." />
             </div>
-
             <div class="ax-tree-view" id="axTreeView">
-              <div class="empty-state">Click "Scan Tree" or launch a task to populate Reference IDs.</div>
+              <div class="empty-state">Click "Scan Tree" to inspect Reference IDs.</div>
             </div>
           </section>
-        </main>
+        </div>
 
-        <!-- Tab 3: Structural Physical Layout Map -->
-        <main class="tab-content" id="tab-map">
+        <!-- Subtab 2: Structural Physical Screen Map -->
+        <div class="adv-subcontent" id="subtab-map">
           <section class="card map-card">
             <div class="card-header">
-              <label class="card-label">Single JSON Array Physical Map</label>
+              <label class="card-label">Single JSON Bounding Box Map</label>
               <button id="refreshMapBtn" class="btn-secondary">Scan Map</button>
             </div>
-            <p class="card-desc">Physical bounding boxes (x, y, w, h) & DOM elements with local PII filter active.</p>
-            <pre class="json-viewer" id="jsonViewer"><code>Click "Scan Map" to view physical bounding screen map.</code></pre>
+            <pre class="json-viewer" id="jsonViewer"><code>Click "Scan Map" to view bounding screen layout map.</code></pre>
           </section>
-        </main>
+        </div>
 
-        <!-- Tab 4: PrivScope Local Binding Table -->
-        <main class="tab-content" id="tab-privscope">
+        <!-- Subtab 3: PrivScope Binding Table -->
+        <div class="adv-subcontent" id="subtab-priv">
           <section class="card settings-card">
             <div class="card-header">
               <label class="card-label">PrivScope On-Device Binding Table</label>
               <button id="refreshPrivScopeBtn" class="btn-secondary">Refresh Table</button>
             </div>
             <p class="card-desc">Sensitive credentials bound locally on-device. Cloud models receive $BIND_* tokens.</p>
-            
             <div class="privscope-view" id="privscopeView">
               <div class="binding-item">
                 <span class="bind-key">$BIND_EMAIL_ADDR_0</span>
                 <span class="bind-value">[ON_DEVICE_PROTECTED]</span>
               </div>
-              <div class="binding-item">
-                <span class="bind-key">$BIND_CARD_NUM_1</span>
-                <span class="bind-value">[ON_DEVICE_PROTECTED]</span>
-              </div>
             </div>
           </section>
-        </main>
+        </div>
 
-        <!-- Tab 5: Config & Trajectory Cache Manager -->
-        <main class="tab-content" id="tab-settings">
+        <!-- Subtab 4: Engine Settings -->
+        <div class="adv-subcontent" id="subtab-config">
           <section class="card settings-card">
             <label class="card-label">Engine & Security Settings</label>
             
             <div class="setting-item">
               <div class="setting-info">
-                <span class="setting-title">Trajectory Caching & Fast Replay</span>
-                <span class="setting-desc">Replay validated task trajectories directly without AI calls</span>
+                <span class="setting-title">Use Local Qwen Model (Ollama)</span>
+                <span class="setting-desc">Invoke local qwen:4b / qwen3:4b on http://127.0.0.1:11434</span>
               </div>
               <label class="switch">
-                <input type="checkbox" id="toggleTrajectoryCache" checked>
+                <input type="checkbox" id="toggleLocalLlm" checked>
                 <span class="slider"></span>
               </label>
             </div>
@@ -173,7 +163,7 @@
             <div class="setting-item">
               <div class="setting-info">
                 <span class="setting-title">PrivScope Local Binding</span>
-                <span class="setting-desc">Keep sensitive credentials strictly on-device in Local Binding Table</span>
+                <span class="setting-desc">Keep sensitive credentials strictly on-device</span>
               </div>
               <label class="switch">
                 <input type="checkbox" id="togglePrivScope" checked>
@@ -183,11 +173,11 @@
 
             <div class="setting-item">
               <div class="setting-info">
-                <span class="setting-title">Use Local Qwen Model (Ollama)</span>
-                <span class="setting-desc">Invoke local qwen:4b LLM on http://localhost:11434 for reasoning</span>
+                <span class="setting-title">Trajectory Cache Replay</span>
+                <span class="setting-desc">Replay validated tasks directly without AI calls</span>
               </div>
               <label class="switch">
-                <input type="checkbox" id="toggleLocalLlm" checked>
+                <input type="checkbox" id="toggleTrajectoryCache">
                 <span class="slider"></span>
               </label>
             </div>
@@ -203,23 +193,14 @@
               </label>
             </div>
 
-            <div style="margin-top: 18px;">
-              <div class="card-header">
-                <label class="card-label">Cached Trajectories</label>
-                <button id="refreshCacheListBtn" class="btn-text">Refresh List</button>
-              </div>
-              <div class="cache-list" id="cacheList">
-                <div class="empty-state">No cached trajectories found.</div>
-              </div>
-            </div>
-
             <div style="margin-top: 14px;">
-              <button id="clearCacheBtn" class="btn btn-secondary" style="width: 100%;">Clear All Cached Trajectories</button>
+              <button id="clearCacheBtn" class="btn btn-secondary" style="width: 100%;">Clear Cached Trajectories</button>
             </div>
           </section>
-        </main>
+        </div>
 
-      </div>
+      </main>
+
     </div>
 
     <!-- Footer Status Bar -->

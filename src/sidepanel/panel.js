@@ -54,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 2. Tab Switching Logic
+  // 2. Tab & Sub-Tab Switching Logic
   navButtons.forEach((btn) => {
     btn.addEventListener('click', () => {
       const targetTab = btn.getAttribute('data-tab');
@@ -65,9 +65,24 @@ document.addEventListener('DOMContentLoaded', () => {
       btn.classList.add('active');
       const targetEl = document.getElementById(targetTab);
       if (targetEl) targetEl.classList.add('active');
+    });
+  });
 
-      if (targetTab === 'tab-settings') loadCacheList();
-      if (targetTab === 'tab-privscope') loadPrivScopeBindings();
+  const advSubBtns = document.querySelectorAll('.adv-subbtn');
+  const advSubContents = document.querySelectorAll('.adv-subcontent');
+
+  advSubBtns.forEach((subBtn) => {
+    subBtn.addEventListener('click', () => {
+      const targetSubtab = subBtn.getAttribute('data-subtab');
+      advSubBtns.forEach((b) => b.classList.remove('active'));
+      advSubContents.forEach((sc) => sc.classList.remove('active'));
+
+      subBtn.classList.add('active');
+      const targetSub = document.getElementById(targetSubtab);
+      if (targetSub) targetSub.classList.add('active');
+
+      if (targetSubtab === 'subtab-config') loadCacheList();
+      if (targetSubtab === 'subtab-priv') loadPrivScopeBindings();
     });
   });
 
