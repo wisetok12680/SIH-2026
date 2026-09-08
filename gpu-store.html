@@ -81,40 +81,6 @@
       font-size: 12px;
     }
 
-    .search-bar-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1;
-      max-width: 480px;
-    }
-
-    .search-input {
-      width: 100%;
-      padding: 10px 14px;
-      background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 6px;
-      color: var(--text-main);
-      font-size: 13px;
-      outline: none;
-    }
-
-    .search-input:focus {
-      border-color: var(--primary);
-    }
-
-    .cart-summary {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #1e293b;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 600;
-    }
-
     /* Banner */
     .category-banner {
       background: #1e1b4b;
@@ -204,7 +170,7 @@
     .specs-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 14px 0;
+      margin: 14px 0 0 0;
       font-size: 12px;
     }
 
@@ -226,7 +192,7 @@
     }
 
     .features-list {
-      margin-bottom: 16px;
+      margin-bottom: 12px;
     }
 
     .feature-tag {
@@ -239,44 +205,6 @@
       border-radius: 4px;
       margin-right: 4px;
       margin-bottom: 4px;
-    }
-
-    /* Actions */
-    .card-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .btn {
-      flex: 1;
-      padding: 9px 12px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      text-align: center;
-      transition: background 0.15s;
-    }
-
-    .btn-primary {
-      background: var(--primary);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--primary-hover);
-    }
-
-    .btn-secondary {
-      background: #334155;
-      color: var(--text-main);
-      border: 1px solid var(--card-border);
-    }
-
-    .btn-secondary:hover {
-      background: #475569;
     }
 
     .console-out {
@@ -300,26 +228,21 @@
       <div class="brand-group">
         <div class="brand-icon">TN</div>
         <div>
-          <h1 class="brand-title">TechNexus Store</h1>
-          <p class="brand-subtitle">Enterprise Workstation & AI Accelerators</p>
+          <h1 class="brand-title">TechNexus Specs Dashboard</h1>
+          <p class="brand-subtitle">Enterprise Workstation & AI Accelerator Technical Specifications</p>
         </div>
       </div>
 
-      <div class="search-bar-container">
-        <input type="text" id="gpuSearchBox" class="search-input" placeholder="Search GPUs (e.g. RTX 4090, 24GB VRAM)..." />
-        <button class="btn btn-secondary" onclick="logStoreAction('Searched GPU catalog')">Search</button>
-      </div>
-
-      <div class="cart-summary">
-        <span>Cart: <strong id="cartCount">0</strong> items</span>
+      <div style="font-size: 12px; color: #94a3b8; font-family: var(--font-mono);">
+        ZERO-CLICK READABLE SPECIFICATIONS
       </div>
     </header>
 
     <!-- Banner -->
     <div class="category-banner">
       <div class="banner-text">
-        <h2>AI Model Training & Inference Hardware Catalog</h2>
-        <p>Compare raw compute TFLOPS, VRAM capacity, memory bandwidth, and pricing for LLM fine-tuning.</p>
+        <h2>AI Model Training & Inference Hardware Specification Catalog</h2>
+        <p>Direct text specifications for compute TFLOPS, VRAM capacity, memory bandwidth, and price-to-VRAM ratios.</p>
       </div>
       <div class="badge-tag">SWAPPABLE REASONING ENGINE ACTIVE</div>
     </div>
@@ -354,11 +277,6 @@
             <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$66.62 / GB</td></tr>
           </table>
         </div>
-
-        <div class="card-actions">
-          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for NVIDIA RTX 4090')">Inspect Specs</button>
-          <button class="btn btn-primary" onclick="addToCart('NVIDIA RTX 4090')">Add to Cart</button>
-        </div>
       </div>
 
       <!-- GPU 2: RTX 4080 Super -->
@@ -386,11 +304,6 @@
             <tr><td class="spec-key">TDP Power</td><td class="spec-val">320 Watts</td></tr>
             <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$62.43 / GB</td></tr>
           </table>
-        </div>
-
-        <div class="card-actions">
-          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for NVIDIA RTX 4080 Super')">Inspect Specs</button>
-          <button class="btn btn-primary" onclick="addToCart('NVIDIA RTX 4080 Super')">Add to Cart</button>
         </div>
       </div>
 
@@ -420,11 +333,6 @@
             <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$39.54 / GB</td></tr>
           </table>
         </div>
-
-        <div class="card-actions">
-          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for AMD RX 7900 XTX')">Inspect Specs</button>
-          <button class="btn btn-primary" onclick="addToCart('AMD RX 7900 XTX')">Add to Cart</button>
-        </div>
       </div>
 
       <!-- GPU 4: RTX 4070 Ti Super -->
@@ -452,11 +360,6 @@
             <tr><td class="spec-key">TDP Power</td><td class="spec-val">285 Watts</td></tr>
             <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$49.93 / GB</td></tr>
           </table>
-        </div>
-
-        <div class="card-actions">
-          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for RTX 4070 Ti Super')">Inspect Specs</button>
-          <button class="btn btn-primary" onclick="addToCart('RTX 4070 Ti Super')">Add to Cart</button>
         </div>
       </div>
 
@@ -486,38 +389,15 @@
             <tr><td class="spec-key">Price-to-VRAM Ratio</td><td class="spec-val">$37.45 / GB</td></tr>
           </table>
         </div>
-
-        <div class="card-actions">
-          <button class="btn btn-secondary" onclick="logStoreAction('Inspected specs for AMD RX 7900 XT')">Inspect Specs</button>
-          <button class="btn btn-primary" onclick="addToCart('AMD RX 7900 XT')">Add to Cart</button>
-        </div>
       </div>
 
     </div>
 
     <!-- Console Log Output -->
     <div class="console-out" id="console-output">
-      [System] GPU Hardware Store Loaded. Ready for multi-attribute comparison query.
+      [System] TechNexus Hardware Specs Dashboard Loaded. All GPU metrics ready for direct zero-click AI perception.
     </div>
 
   </div>
-
-  <script>
-    let cart = [];
-
-    function addToCart(gpuName) {
-      cart.push(gpuName);
-      document.getElementById('cartCount').innerText = cart.length;
-      logStoreAction(`Added '${gpuName}' to cart.`);
-    }
-
-    function logStoreAction(msg) {
-      const consoleEl = document.getElementById('console-output');
-      if (consoleEl) {
-        consoleEl.innerHTML += `<br>[${new Date().toLocaleTimeString()}] ${msg}`;
-        consoleEl.scrollTop = consoleEl.scrollHeight;
-      }
-    }
-  </script>
 </body>
 </html>
