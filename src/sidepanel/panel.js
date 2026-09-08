@@ -97,7 +97,15 @@ document.addEventListener('DOMContentLoaded', () => {
     startBtn.disabled = true;
     stopBtn.disabled = false;
     captchaBanner.style.display = 'none';
+    
+    // Hide previous response/buffer cards so trajectory timeline is active
+    const bufferCard = document.getElementById('reasoningBufferCard');
+    const respCard = document.getElementById('agentResponseCard');
+    if (bufferCard) bufferCard.style.display = 'none';
+    if (respCard) respCard.style.display = 'none';
+
     updateStatusBadge('RUNNING', true);
+    addLogEntry('INFO', `Started task: "${taskText}"`);
 
     chrome.runtime.sendMessage(
       {
@@ -338,14 +346,18 @@ document.addEventListener('DOMContentLoaded', () => {
     if (countdownTag) countdownTag.innerText = `${remaining}s Remaining`;
     if (progressBar) progressBar.style.width = `${(elapsed / totalSec) * 100}%`;
 
-    if (substepText) {
-      if (elapsed <= 6) {
-        substepText.innerText = '[1/3] Parsing accessibility tree hardware metrics...';
-      } else if (elapsed <= 13) {
-        substepText.innerText = '[2/3] Evaluating price-to-VRAM ratios & FP16 TFLOPS with Qwen 4B...';
-      } else {
-        substepText.innerText = '[3/3] Compiling executive synthesis recommendation...';
-      }
+    let stepMsg = '';
+    if (elapsed === 0) {
+      stepMsg = '[1/3] Parsing accessibility tree hardware metrics...';
+    } else if (elapsed === 7) {
+      stepMsg = '[2/3] Evaluating price-to-VRAM ratios & FP16 TFLOPS with local Qwen 4B...';
+    } else if (elapsed === 14) {
+      stepMsg = '[3/3] Compiling executive synthesis recommendation...';
+    }
+
+    if (stepMsg) {
+      if (substepText) substepText.innerText = stepMsg;
+      addLogEntry('INFO', `[Reasoning ${elapsed}s/${totalSec}s] ${stepMsg}`);
     }
   }
 
