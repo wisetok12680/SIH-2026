@@ -227,7 +227,7 @@ Respond ONLY with valid JSON in this exact structure:
         const nameLower = `${targetInput.name || ''} ${targetInput.type || ''} ${targetInput.ref || ''}`.toLowerCase();
 
         let fillVal = 'Alexander Vance';
-        if (nameLower.includes('name') || nameLower.includes('full')) fillVal = 'Alexander Vance';
+        if (nameLower.includes('full name') || nameLower.includes('name') || nameLower.includes('first') || nameLower.includes('last')) fillVal = 'Alexander Vance';
         else if (nameLower.includes('email')) fillVal = 'alex.vance@privacy.org';
         else if (nameLower.includes('phone') || nameLower.includes('tel') || nameLower.includes('mobile')) fillVal = '+1 (555) 892-1243';
         else if (nameLower.includes('experience') || nameLower.includes('years') || nameLower.includes('exp')) fillVal = '5';

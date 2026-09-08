@@ -118,7 +118,20 @@ function getAccessibleName(el) {
     return (el.labels[0].innerText || '').trim();
   }
 
+  if (el.id) {
+    const explicitLabel = document.querySelector(`label[for="${el.id}"]`);
+    if (explicitLabel) return (explicitLabel.innerText || '').trim();
+  }
+
+  const parentGroup = el.closest('.form-group, .field, .form-field, label');
+  if (parentGroup) {
+    const groupLabel = parentGroup.querySelector('label, .form-label, .field-label');
+    if (groupLabel) return (groupLabel.innerText || '').trim();
+  }
+
   if (el.placeholder) return el.placeholder.trim();
+  if (el.name) return el.name.trim();
+  if (el.id) return el.id.trim();
   if (el.alt) return el.alt.trim();
   if (el.title) return el.title.trim();
 
