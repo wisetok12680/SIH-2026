@@ -362,12 +362,30 @@ async def reason_endpoint(req: ReasonRequest):
     # Check search / fill matching
     if not proposed_action and any(k in prompt_lower for k in ["search", "fill", "type", "enter"]):
         for el in elements:
-            if el.role in ["textbox", "searchbox"] or el.tagName == "input":
+            if el.role in ["textbox", "searchbox"] or el.tagName in ["input", "textarea"]:
+                el_name = ((el.name or "") + " " + (el.id or "") + " " + (el.ref or "")).lower()
+                val = "Alexander Vance"
+                if "name" in el_name: val = "Alexander Vance"
+                elif "email" in el_name: val = "alex.vance@privacy.org"
+                elif "phone" in el_name or "tel" in el_name: val = "+1 (555) 892-1243"
+                elif "city" in el_name or "location" in el_name: val = "San Francisco, CA"
+                elif "linkedin" in el_name: val = "https://linkedin.com/in/alexandervance"
+                elif "portfolio" in el_name or "github" in el_name: val = "https://github.com/wisetok12680"
+                elif "role" in el_name or "title" in el_name: val = "AI Systems Engineer"
+                elif "experience" in el_name or "years" in el_name: val = "5"
+                elif "employer" in el_name or "company" in el_name: val = "Privacy AI Labs"
+                elif "notice" in el_name: val = "30"
+                elif "salary" in el_name: val = "140,000"
+                elif "skill" in el_name: val = "Python, PyTorch, Node.js, WebGPU"
+                elif "degree" in el_name: val = "Master of Science in Computer Science"
+                elif "university" in el_name or "institution" in el_name: val = "Stanford University"
+                elif "cover" in el_name or "letter" in el_name or "statement" in el_name: val = "Experienced AI Systems Engineer specializing in local privacy-preserving browser automation."
+
                 proposed_action = {
-                    "thought": f"Identified input target element '{el.name or el.ref}'",
+                    "thought": f"Identified form input target element '{el.name or el.ref}' -> Filling '{val}'",
                     "action": "TYPE",
                     "target_ref": el.ref or el.id,
-                    "value": "Search Query"
+                    "value": val
                 }
                 break
 

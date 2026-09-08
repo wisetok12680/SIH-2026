@@ -16,7 +16,7 @@ let agentState = {
   isPausedForCaptcha: false,
   currentTask: '',
   actionHistory: [],
-  maxSteps: 10,
+  maxSteps: 30,
   currentStep: 0,
   routingMode: 'LOCAL_AGENT',
   cacheHit: false,

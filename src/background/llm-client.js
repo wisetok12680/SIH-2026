@@ -179,7 +179,7 @@ Respond ONLY with valid JSON in this exact structure:
     const intentResult = localMlEngine.classifyIntent(userGoal);
     const scoredElements = localMlEngine.scoreElements(axNodes, userGoal);
 
-    if (actionHistory.length >= 8) {
+    if (actionHistory.length >= 30) {
       return {
         thought: `Completed maximum trajectory steps (Local Intent: ${intentResult.intent})`,
         action: 'FINISH',
@@ -224,15 +224,24 @@ Respond ONLY with valid JSON in this exact structure:
 
       if (untypedInputs.length > 0) {
         const targetInput = untypedInputs[0];
-        const nameLower = `${targetInput.name || ''} ${targetInput.type || ''} ${targetInput.ref || ''}`.toLowerCase();
+        const nameLower = `${targetInput.name || ''} ${targetInput.id || ''} ${targetInput.type || ''} ${targetInput.ref || ''}`.toLowerCase();
 
         let fillVal = 'Alexander Vance';
-        if (nameLower.includes('full name') || nameLower.includes('name') || nameLower.includes('first') || nameLower.includes('last')) fillVal = 'Alexander Vance';
+        if (nameLower.includes('full name') || nameLower.includes('fullname') || nameLower.includes('name') || nameLower.includes('first') || nameLower.includes('last')) fillVal = 'Alexander Vance';
         else if (nameLower.includes('email')) fillVal = 'alex.vance@privacy.org';
         else if (nameLower.includes('phone') || nameLower.includes('tel') || nameLower.includes('mobile')) fillVal = '+1 (555) 892-1243';
-        else if (nameLower.includes('experience') || nameLower.includes('years') || nameLower.includes('exp')) fillVal = '5';
+        else if (nameLower.includes('city') || nameLower.includes('location')) fillVal = 'San Francisco, CA';
+        else if (nameLower.includes('linkedin')) fillVal = 'https://linkedin.com/in/alexandervance';
         else if (nameLower.includes('portfolio') || nameLower.includes('github') || nameLower.includes('url') || nameLower.includes('link') || nameLower.includes('website')) fillVal = 'https://github.com/wisetok12680';
-        else if (nameLower.includes('cover') || nameLower.includes('letter') || nameLower.includes('about') || nameLower.includes('bio') || nameLower.includes('summary')) fillVal = 'Experienced AI Systems Engineer specializing in local privacy-preserving browser automation.';
+        else if (nameLower.includes('role') || nameLower.includes('title')) fillVal = 'AI Systems Engineer';
+        else if (nameLower.includes('experience') || nameLower.includes('years') || nameLower.includes('exp')) fillVal = '5';
+        else if (nameLower.includes('employer') || nameLower.includes('company')) fillVal = 'Privacy AI Labs';
+        else if (nameLower.includes('notice')) fillVal = '30';
+        else if (nameLower.includes('salary')) fillVal = '140,000';
+        else if (nameLower.includes('skill')) fillVal = 'Python, PyTorch, Node.js, WebGPU';
+        else if (nameLower.includes('degree')) fillVal = 'Master of Science in Computer Science';
+        else if (nameLower.includes('university') || nameLower.includes('institution')) fillVal = 'Stanford University';
+        else if (nameLower.includes('cover') || nameLower.includes('letter') || nameLower.includes('about') || nameLower.includes('bio') || nameLower.includes('summary') || nameLower.includes('statement')) fillVal = 'Experienced AI Systems Engineer specializing in local privacy-preserving browser automation.';
         else fillVal = 'Alexander Vance';
 
         return {
@@ -291,7 +300,7 @@ Respond ONLY with valid JSON in this exact structure:
 
       if (targetInput && !alreadyTyped) {
         const valMatch = userGoal.match(/(?:for|with|enter|search|type)\s+["']?([^"']+)["']?/i);
-        const queryVal = valMatch ? valMatch[1].trim() : 'Search Query';
+        const queryVal = valMatch ? valMatch[1].trim() : 'AI Engineer';
 
         return {
           thought: `Identified input target [${targetInput.role}] ${targetInput.ref} ("${targetInput.name}")`,
