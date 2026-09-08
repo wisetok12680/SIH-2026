@@ -162,35 +162,26 @@ body {
 .captcha-title { font-size: 12px; font-weight: 700; color: #fb7185; }
 .captcha-desc { font-size: 11px; color: #fecdd3; }
 
-/* Workspace Layout with Vertical Side Navigation */
-.workspace-layout {
+/* Horizontal Top Navigation Bar */
+.top-nav {
   display: flex;
-  flex: 1;
-  overflow: hidden;
-}
-
-.side-nav {
-  display: flex;
-  flex-direction: column;
-  width: 72px;
   background: #0f172a;
-  border-right: 1px solid var(--card-border);
-  padding: 8px 4px;
-  gap: 4px;
+  border-bottom: 1px solid var(--card-border);
+  padding: 6px 12px;
+  gap: 6px;
 }
 
 .nav-btn {
+  flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  padding: 10px 2px;
+  padding: 8px 12px;
   background: transparent;
   border: 1px solid transparent;
-  border-radius: 4px;
+  border-radius: 6px;
   color: var(--text-muted);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
@@ -204,8 +195,8 @@ body {
 
 .nav-btn.active {
   color: #ffffff;
-  background: #1e293b;
-  border-color: var(--primary);
+  background: var(--primary);
+  border-color: var(--primary-hover);
 }
 
 .main-content-area {
