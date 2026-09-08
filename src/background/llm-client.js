@@ -215,29 +215,47 @@ Respond ONLY with valid JSON in this exact structure:
     }
 
     // 1. Job / Form Application Multi-Field Auto-Fill
-    if (goalLower.includes('job') || goalLower.includes('apply') || goalLower.includes('application') || goalLower.includes('form')) {
+    if (goalLower.includes('job') || goalLower.includes('apply') || goalLower.includes('application') || goalLower.includes('form') || goalLower.includes('fill')) {
       const untypedInputs = axNodes.filter((n) => 
         (n.role === 'textbox' || n.role === 'searchbox' || n.tagName === 'input' || n.tagName === 'textarea') &&
+        n.type !== 'checkbox' && n.type !== 'radio' && n.type !== 'submit' && n.type !== 'button' &&
         !actionHistory.some((a) => a.action === 'TYPE' && a.targetRef === n.ref)
       );
 
       if (untypedInputs.length > 0) {
         const targetInput = untypedInputs[0];
-        const nameLower = (targetInput.name || targetInput.type || targetInput.ref || '').toLowerCase();
+        const nameLower = `${targetInput.name || ''} ${targetInput.type || ''} ${targetInput.ref || ''}`.toLowerCase();
 
         let fillVal = 'Alexander Vance';
-        if (nameLower.includes('email')) fillVal = 'alex.vance@privacy.org';
-        else if (nameLower.includes('phone')) fillVal = '+1 (555) 892-1243';
-        else if (nameLower.includes('experience') || nameLower.includes('years')) fillVal = '5';
-        else if (nameLower.includes('portfolio') || nameLower.includes('github') || nameLower.includes('link')) fillVal = 'https://github.com/wisetok12680';
-        else if (nameLower.includes('cover') || nameLower.includes('letter') || nameLower.includes('about')) fillVal = 'Experienced AI Systems Engineer specializing in local privacy-preserving browser automation.';
+        if (nameLower.includes('name') || nameLower.includes('full')) fillVal = 'Alexander Vance';
+        else if (nameLower.includes('email')) fillVal = 'alex.vance@privacy.org';
+        else if (nameLower.includes('phone') || nameLower.includes('tel') || nameLower.includes('mobile')) fillVal = '+1 (555) 892-1243';
+        else if (nameLower.includes('experience') || nameLower.includes('years') || nameLower.includes('exp')) fillVal = '5';
+        else if (nameLower.includes('portfolio') || nameLower.includes('github') || nameLower.includes('url') || nameLower.includes('link') || nameLower.includes('website')) fillVal = 'https://github.com/wisetok12680';
+        else if (nameLower.includes('cover') || nameLower.includes('letter') || nameLower.includes('about') || nameLower.includes('bio') || nameLower.includes('summary')) fillVal = 'Experienced AI Systems Engineer specializing in local privacy-preserving browser automation.';
+        else fillVal = 'Alexander Vance';
 
         return {
-          thought: `Autonomously filling job application field '${targetInput.name || targetInput.ref}'`,
+          thought: `Autonomously filling form field '${targetInput.name || targetInput.ref}' with '${fillVal}'`,
           action: 'TYPE',
           ref: targetInput.ref,
           targetRef: targetInput.ref,
           value: fillVal
+        };
+      }
+
+      // Check unclicked privacy checkbox
+      const unclickedCheckbox = axNodes.find((n) => 
+        (n.role === 'checkbox' || n.type === 'checkbox') &&
+        !actionHistory.some((a) => a.action === 'CLICK' && a.targetRef === n.ref)
+      );
+
+      if (unclickedCheckbox) {
+        return {
+          thought: `Accepting privacy terms checkbox '${unclickedCheckbox.name || unclickedCheckbox.ref}'`,
+          action: 'CLICK',
+          ref: unclickedCheckbox.ref,
+          targetRef: unclickedCheckbox.ref
         };
       }
 
@@ -267,7 +285,7 @@ Respond ONLY with valid JSON in this exact structure:
     }
 
     // 2. Target Text Input / Search
-    if (goalLower.includes('search') || goalLower.includes('find') || goalLower.includes('fill') || goalLower.includes('type')) {
+    if (goalLower.includes('search') || goalLower.includes('find') || goalLower.includes('lookup')) {
       const targetInput = axNodes.find((n) => n.role === 'textbox' || n.role === 'searchbox' || n.tagName === 'input');
       const alreadyTyped = actionHistory.some((a) => a.action === 'TYPE' && a.targetRef === targetInput?.ref);
 
