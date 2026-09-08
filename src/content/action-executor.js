@@ -124,6 +124,23 @@ export async function executeAgentAction(actionPayload) {
   }
 }
 
+export async function sequentialCardHighlightScanner() {
+  const cards = document.querySelectorAll('.gpu-card, .form-card, .card, article, .product-card');
+  if (!cards || cards.length === 0) return;
+
+  for (let i = 0; i < cards.length; i++) {
+    const card = cards[i];
+    card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    highlightElement(card, {
+      action: 'PARSING_SPECS',
+      ref: `@card_${i + 1}`
+    });
+
+    await sleep(550);
+  }
+}
+
 function highlightElement(el, actionPayload = {}) {
   const { action = 'ACTION', ref, targetRef } = actionPayload;
   const refId = ref || targetRef || '@e';
@@ -148,8 +165,9 @@ function highlightElement(el, actionPayload = {}) {
     pointer-events: none;
     z-index: 2147483647;
     border: 2px solid #6366f1;
-    border-radius: 4px;
-    background: rgba(99, 102, 241, 0.08);
+    border-radius: 6px;
+    background: rgba(99, 102, 241, 0.12);
+    box-shadow: 0 0 16px rgba(99, 102, 241, 0.4);
     transition: opacity 0.2s ease-in-out;
   `;
 

@@ -5,7 +5,7 @@
 
 let modulesLoaded = false;
 let extractPhysicalLayoutMap, redactLayoutMap, executeAgentAction, checkAndDismissInterrupts, waitForDomStability;
-let generateAXTreeSnapshot, privScope;
+let generateAXTreeSnapshot, privScope, sequentialCardHighlightScanner;
 
 async function ensureModulesLoaded() {
   if (modulesLoaded) return;
@@ -27,6 +27,7 @@ async function ensureModulesLoaded() {
   extractPhysicalLayoutMap = layoutMod.extractPhysicalLayoutMap;
   redactLayoutMap = piiMod.redactLayoutMap;
   executeAgentAction = actionMod.executeAgentAction;
+  sequentialCardHighlightScanner = actionMod.sequentialCardHighlightScanner;
   checkAndDismissInterrupts = interruptMod.checkAndDismissInterrupts;
   waitForDomStability = interruptMod.waitForDomStability;
   generateAXTreeSnapshot = axMod.generateAXTreeSnapshot;
@@ -55,13 +56,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             break;
           }
 
-          // 2. Extract Accessibility Tree Snapshot with @e1, @e2 Refs
+          // 2. Sequentially spotlight each card on page to show visual scanning
+          try {
+            sequentialCardHighlightScanner();
+          } catch (e) {}
+
+          // 3. Extract Accessibility Tree Snapshot with @e1, @e2 Refs
           const axTree = generateAXTreeSnapshot();
 
-          // 3. Extract DOM physical layout
+          // 4. Extract DOM physical layout
           let layoutData = extractPhysicalLayoutMap();
 
-          // 4. Apply PrivScope abstraction & PII redaction if enabled
+          // 5. Apply PrivScope abstraction & PII redaction if enabled
           if (request.enablePiiFilter !== false) {
             layoutData = redactLayoutMap(layoutData);
           }
