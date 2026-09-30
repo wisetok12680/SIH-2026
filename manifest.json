@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Atlas & Comet Local Agent",
+  "name": "Agent",
   "version": "1.0.0",
   "description": "Autonomous local agent for physical layout parsing, privacy-preserving visual analysis, structural screen mapping, and web automation.",
   "permissions": [

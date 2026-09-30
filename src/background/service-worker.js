@@ -205,7 +205,8 @@ async function runAgentLoop() {
           payload: {
             thought: plan.thought,
             value: answerText,
-            route: agentState.routingMode
+            route: agentState.routingMode,
+            isFormTask: !!plan.isFormTask
           }
         }).catch(() => {});
 
@@ -275,6 +276,10 @@ async function sendMessageWithAutoInject(tabId, message) {
   try {
     return await chrome.tabs.sendMessage(tabId, message);
   } catch (err) {
+    if (err.message && (err.message.includes('message channel closed') || err.message.includes('channel closed'))) {
+      await sleep(500);
+      return { status: 'SUCCESS', message: 'Page navigation occurred.' };
+    }
     if (err.message && (err.message.includes('Could not establish connection') || err.message.includes('Receiving end does not exist'))) {
       try {
         await chrome.scripting.executeScript({

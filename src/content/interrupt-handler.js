@@ -209,4 +209,3 @@ export function waitForDomStability(timeoutMs = 3000) {
     }, timeoutMs);
   });
 }
-

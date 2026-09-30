@@ -34,7 +34,7 @@ async function ensureModulesLoaded() {
   privScope = privMod.privScope;
 
   modulesLoaded = true;
-  console.log('[Atlas & Comet Local Agent] Content script modules loaded.');
+  console.log('[Agent] Content script modules loaded.');
 }
 
 // Synchronously register message listener at top level

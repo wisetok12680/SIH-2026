@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TechNexus Marketplace - High-Performance Workstation GPUs</title>
+  <title>Agent - GPU Specifications Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0b0f19;
-      --card-bg: #161e2e;
-      --card-border: #1e293b;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --accent-emerald: #059669;
-      --accent-amber: #d97706;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --input-bg: #0f172a;
+      --bg-dark: #0a0a0a;
+      --card-bg: #141414;
+      --card-border: #262626;
+      --card-border-hover: #404040;
+      --input-bg: #1a1a1a;
+      --primary: #e5e5e5;
+      --primary-hover: #ffffff;
+      --text-main: #f5f5f5;
+      --text-muted: #a3a3a3;
+      --text-dim: #737373;
       --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
       --font-mono: 'Fira Code', monospace;
     }
@@ -29,20 +29,90 @@
       font-family: var(--font-sans);
       background: var(--bg-dark);
       color: var(--text-main);
-      padding: 24px 20px;
-      line-height: 1.6;
+      padding: 0;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Shared Navigation Bar */
+    .app-navbar {
+      background: #141414;
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .brand-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #262626;
+      color: #a3a3a3;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.15s ease;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+      color: var(--text-main);
+      background: #262626;
+    }
+
+    .nav-link.active {
+      color: #0a0a0a;
+      background: var(--primary);
+      border-color: var(--primary);
     }
 
     .container {
       max-width: 1100px;
-      margin: 0 auto;
+      margin: 32px auto;
+      padding: 0 20px 40px;
     }
 
-    /* Navbar Header */
+    /* Header Title Bar */
     .store-header {
-      background: #0f172a;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 20px 24px;
       margin-bottom: 24px;
       display: flex;
@@ -51,29 +121,11 @@
       gap: 16px;
     }
 
-    .brand-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .brand-icon {
-      width: 42px;
-      height: 42px;
-      background: var(--primary);
-      color: white;
-      font-weight: 800;
-      font-size: 18px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
     .brand-title {
       font-size: 20px;
       font-weight: 700;
       color: #ffffff;
+      letter-spacing: -0.3px;
     }
 
     .brand-subtitle {
@@ -83,9 +135,9 @@
 
     /* Banner */
     .category-banner {
-      background: #1e1b4b;
-      border: 1px solid #4338ca;
-      border-radius: 10px;
+      background: #171717;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
       padding: 18px 24px;
       margin-bottom: 24px;
       display: flex;
@@ -94,24 +146,25 @@
     }
 
     .banner-text h2 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
-      color: #c7d2fe;
+      color: #f5f5f5;
     }
 
     .banner-text p {
-      font-size: 13px;
-      color: #a5b4fc;
+      font-size: 12px;
+      color: #a3a3a3;
     }
 
     .badge-tag {
-      background: #312e81;
-      color: #818cf8;
+      background: #262626;
+      color: #e5e5e5;
       font-family: var(--font-mono);
       font-size: 11px;
       padding: 4px 10px;
       border-radius: 4px;
       font-weight: 600;
+      border: 1px solid #404040;
     }
 
     /* Grid Layout */
@@ -125,16 +178,16 @@
     .gpu-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 20px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: border-color 0.2s;
+      transition: border-color 0.2s, background 0.2s;
     }
 
     .gpu-card:hover {
-      border-color: #3b82f6;
+      border-color: var(--card-border-hover);
     }
 
     .gpu-header {
@@ -145,24 +198,24 @@
     }
 
     .gpu-vendor {
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #60a5fa;
+      letter-spacing: 0.8px;
+      color: #a3a3a3;
     }
 
     .gpu-title {
-      font-size: 17px;
+      font-size: 16px;
       font-weight: 700;
       color: #ffffff;
       margin-top: 2px;
     }
 
     .gpu-price {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
-      color: #34d399;
+      color: #ffffff;
       font-family: var(--font-mono);
     }
 
@@ -176,7 +229,7 @@
 
     .specs-table td {
       padding: 6px 0;
-      border-bottom: 1px dashed #1e293b;
+      border-bottom: 1px dashed #262626;
     }
 
     .specs-table td.spec-key {
@@ -185,7 +238,7 @@
     }
 
     .specs-table td.spec-val {
-      color: #f8fafc;
+      color: #f5f5f5;
       font-weight: 600;
       text-align: right;
       font-family: var(--font-mono);
@@ -197,9 +250,9 @@
 
     .feature-tag {
       display: inline-block;
-      background: #0f172a;
+      background: #1a1a1a;
       border: 1px solid var(--card-border);
-      color: #cbd5e1;
+      color: #a3a3a3;
       font-size: 11px;
       padding: 3px 8px;
       border-radius: 4px;
@@ -208,32 +261,42 @@
     }
 
     .console-out {
-      background: #030712;
+      background: #000000;
       border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 14px;
       font-family: var(--font-mono);
       font-size: 12px;
-      color: #38bdf8;
+      color: #d4d4d4;
       max-height: 140px;
       overflow-y: auto;
     }
   </style>
 </head>
 <body>
+
+  <!-- Top Shared Navbar -->
+  <nav class="app-navbar">
+    <div class="nav-brand">
+      <span class="brand-logo">Agent</span>
+      <span class="brand-tag">Web App</span>
+    </div>
+    <div class="nav-links">
+      <a href="test-page.html" class="nav-link">Job Application</a>
+      <a href="gpu-store.html" class="nav-link active">GPU Specifications</a>
+    </div>
+  </nav>
+
   <div class="container">
     
     <!-- Navbar Header -->
     <header class="store-header">
-      <div class="brand-group">
-        <div class="brand-icon">TN</div>
-        <div>
-          <h1 class="brand-title">TechNexus Specs Dashboard</h1>
-          <p class="brand-subtitle">Enterprise Workstation & AI Accelerator Technical Specifications</p>
-        </div>
+      <div>
+        <h1 class="brand-title">GPU Specifications Dashboard</h1>
+        <p class="brand-subtitle">Enterprise Workstation & AI Accelerator Technical Specifications</p>
       </div>
 
-      <div style="font-size: 12px; color: #94a3b8; font-family: var(--font-mono);">
+      <div style="font-size: 11px; color: #a3a3a3; font-family: var(--font-mono); letter-spacing: 0.5px;">
         ZERO-CLICK READABLE SPECIFICATIONS
       </div>
     </header>
@@ -241,10 +304,10 @@
     <!-- Banner -->
     <div class="category-banner">
       <div class="banner-text">
-        <h2>AI Model Training & Inference Hardware Specification Catalog</h2>
+        <h2>AI Hardware Specification Catalog</h2>
         <p>Direct text specifications for compute TFLOPS, VRAM capacity, memory bandwidth, and price-to-VRAM ratios.</p>
       </div>
-      <div class="badge-tag">SWAPPABLE REASONING ENGINE ACTIVE</div>
+      <div class="badge-tag">REASONING ENGINE ACTIVE</div>
     </div>
 
     <!-- GPU Products Grid -->
@@ -395,7 +458,7 @@
 
     <!-- Console Log Output -->
     <div class="console-out" id="console-output">
-      [System] TechNexus Hardware Specs Dashboard Loaded. All GPU metrics ready for direct zero-click AI perception.
+      [System] Hardware Specs Dashboard Loaded. All GPU metrics ready for direct zero-click Agent perception.
     </div>
 
   </div>

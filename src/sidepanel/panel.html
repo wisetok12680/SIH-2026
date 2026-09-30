@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Atlas & Comet Agent</title>
+  <title>Agent Sidepanel</title>
   <link rel="stylesheet" href="panel.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,12 +14,9 @@
 
     <!-- Header -->
     <header class="header">
-      <div class="brand">
-        <div class="logo-icon">AC</div>
-        <div>
-          <h1 class="app-title">Atlas & Comet</h1>
-          <p class="app-subtitle">Autonomous Local Agent</p>
-        </div>
+      <div class="header-center">
+        <h1 class="app-title">Agent</h1>
+        <p class="app-subtitle">Autonomous Local Agent</p>
       </div>
       <div class="badge-group">
         <div class="status-badge offline" id="backendHealthBadge" title="FastAPI Backend Server Status">ML: OFF</div>
@@ -28,7 +25,7 @@
       </div>
     </header>
 
-    <!-- Top Navigation Bar: Front Chat vs Advanced Tools -->
+    <!-- Top Navigation Bar -->
     <nav class="top-nav">
       <button class="nav-btn active" data-tab="tab-control">CHAT & LOGS</button>
       <button class="nav-btn" data-tab="tab-advanced">ADVANCED TOOLS</button>
@@ -51,7 +48,6 @@
         <section class="card input-card">
           <div class="card-header">
             <label for="taskPrompt" class="card-label">Task Goal & Instructions</label>
-            <span class="cache-indicator" id="cacheHitIndicator" style="display: none;">Fast Replay Ready</span>
           </div>
           <textarea 
             id="taskPrompt" 
@@ -60,43 +56,38 @@
             rows="3"
           >Fill job application form</textarea>
           
-          <!-- Equal Width Action Buttons -->
           <div class="button-group-floating">
-            <button id="startAgentBtn" class="btn btn-primary btn-equal">
-              Start Task
-            </button>
-            <button id="stopAgentBtn" class="btn btn-danger btn-equal" disabled>
-              Stop
-            </button>
+            <button id="startAgentBtn" class="btn btn-primary btn-equal">Start Task</button>
+            <button id="stopAgentBtn" class="btn btn-danger btn-equal" disabled>Stop</button>
           </div>
         </section>
 
         <!-- 20-SECOND REASONING BUFFER CARD -->
-        <section class="card buffer-card" id="reasoningBufferCard" style="display: none; border: 1px solid #6366f1; background: #0f172a; margin-bottom: 12px;">
+        <section class="card buffer-card" id="reasoningBufferCard" style="display: none; border: 1px solid #404040; background: #141414; margin-bottom: 12px;">
           <div class="card-header" style="margin-bottom: 6px;">
-            <label class="card-label" style="color: #a5b4fc;">LOCAL REASONING SYNTHESIS</label>
+            <label class="card-label" style="color: #d4d4d4;">LOCAL REASONING SYNTHESIS</label>
             <span class="status-badge active" id="bufferCountdownTag">20s Remaining</span>
           </div>
           <div class="buffer-body">
-            <div style="font-size: 12px; font-weight: 600; color: #f8fafc;" id="bufferStatusText">
+            <div style="font-size: 12px; font-weight: 600; color: #f5f5f5;" id="bufferStatusText">
               Synthesizing DOM metrics with local Qwen 4B LLM...
             </div>
-            <div style="width: 100%; height: 6px; background: #1e293b; border-radius: 4px; overflow: hidden; margin: 10px 0;">
-              <div id="progressBarFill" style="height: 100%; width: 0%; background: #6366f1; transition: width 0.2s linear;"></div>
+            <div style="width: 100%; height: 6px; background: #262626; border-radius: 4px; overflow: hidden; margin: 10px 0;">
+              <div id="progressBarFill" style="height: 100%; width: 0%; background: #e5e5e5; transition: width 0.2s linear;"></div>
             </div>
-            <div style="font-size: 11px; color: #94a3b8; font-family: 'Fira Code', monospace;" id="bufferSubstepText">
+            <div style="font-size: 11px; color: #a3a3a3; font-family: 'Fira Code', monospace;" id="bufferSubstepText">
               [1/3] Parsing accessibility tree hardware metrics...
             </div>
           </div>
         </section>
 
         <!-- AGENT CONCLUSION & ANSWER RESPONSE BOX -->
-        <section class="card response-card" id="agentResponseCard" style="display: none; border: 1px solid #3b82f6; background: #0f172a; margin-bottom: 12px;">
+        <section class="card response-card" id="agentResponseCard" style="display: none; border: 1px solid #404040; background: #141414; margin-bottom: 12px;">
           <div class="card-header" style="margin-bottom: 6px;">
-            <label class="card-label" style="color: #60a5fa;">AGENT CONCLUSION & ANSWER</label>
+            <label class="card-label" style="color: #e5e5e5;">AGENT CONCLUSION & ANSWER</label>
             <span class="status-badge online" id="responseBadge">AI SYNTHESIS</span>
           </div>
-          <div class="response-content" id="agentResponseBody" style="font-size: 12px; line-height: 1.5; color: #f8fafc; background: #030712; border: 1px solid #1e293b; border-radius: 6px; padding: 10px 12px; white-space: pre-wrap; word-break: break-word;">
+          <div class="response-content" id="agentResponseBody" style="font-size: 12px; line-height: 1.5; color: #f5f5f5; background: #0a0a0a; border: 1px solid #262626; border-radius: 6px; padding: 10px 12px; white-space: pre-wrap; word-break: break-word;">
             Ready to compute answer.
           </div>
         </section>
@@ -109,16 +100,14 @@
           </div>
           <div class="log-container" id="logContainer" style="flex: 1; min-height: 280px;">
             <div class="log-entry log-info">
-              <span class="log-time">[System]</span> Atlas & Comet Agent Ready. Qwen LLM & PrivScope active.
+              <span class="log-time">[System]</span> Agent Ready. Qwen LLM & PrivScope active.
             </div>
           </div>
         </section>
       </main>
 
-      <!-- ADVANCED SECTION VIEW: AX Tree, Map, Privacy, Config -->
+      <!-- ADVANCED SECTION VIEW -->
       <main class="tab-content" id="tab-advanced">
-        
-        <!-- Advanced Section Tabs -->
         <div class="advanced-subnav">
           <button class="adv-subbtn active" data-subtab="subtab-ax">AX Tree</button>
           <button class="adv-subbtn" data-subtab="subtab-map">Screen Map</button>
@@ -127,7 +116,6 @@
           <button class="adv-subbtn" data-subtab="subtab-config">Settings</button>
         </div>
 
-        <!-- Subtab 1: Accessibility Ref Tree -->
         <div class="adv-subcontent active" id="subtab-ax">
           <section class="card map-card">
             <div class="card-header">
@@ -143,7 +131,6 @@
           </section>
         </div>
 
-        <!-- Subtab 2: Structural Physical Screen Map -->
         <div class="adv-subcontent" id="subtab-map">
           <section class="card map-card">
             <div class="card-header">
@@ -154,7 +141,6 @@
           </section>
         </div>
 
-        <!-- Subtab 3: Dispatched LLM Payload JSON -->
         <div class="adv-subcontent" id="subtab-llm">
           <section class="card map-card">
             <div class="card-header">
@@ -164,11 +150,10 @@
             <p style="font-size: 11px; color: #94a3b8; margin-bottom: 8px;">
               Exact payload JSON dispatched to local Ollama model (<code>qwen3:4b</code>) at <code>http://127.0.0.1:11434/api/generate</code>.
             </p>
-            <pre class="json-viewer" id="llmPayloadViewer"><code>No LLM payload dispatched yet. Run an analytical task (e.g. 'Compare GPU specs') to inspect payload JSON.</code></pre>
+            <pre class="json-viewer" id="llmPayloadViewer"><code>No LLM payload dispatched yet. Run a task to inspect payload JSON.</code></pre>
           </section>
         </div>
 
-        <!-- Subtab 3: PrivScope Binding Table -->
         <div class="adv-subcontent" id="subtab-priv">
           <section class="card settings-card">
             <div class="card-header">
@@ -185,7 +170,6 @@
           </section>
         </div>
 
-        <!-- Subtab 4: Engine Settings -->
         <div class="adv-subcontent" id="subtab-config">
           <section class="card settings-card">
             <label class="card-label">Engine & Security Settings</label>
@@ -253,6 +237,6 @@
     </footer>
   </div>
 
-  <script src="panel.js" type="module"></script>
+  <script src="panel.js"></script>
 </body>
 </html>

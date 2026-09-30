@@ -44,15 +44,163 @@ export class AgentPlannerClient {
     return this.model || 'qwen3:4b';
   }
 
+  async broadcastPayloadObject(userGoal, layoutData, actionHistory, customPrompt = null, endpoint = 'http://127.0.0.1:11434/api/generate') {
+    const axNodes = layoutData?.axTree?.nodes || [];
+    const compactAxTree = axNodes.map((n) => ({
+      ref: n.ref,
+      role: n.role,
+      name: n.name,
+      value: n.value
+    })).slice(0, 35);
+
+    const activeModel = await this.getActiveModel('http://127.0.0.1:11434');
+    const promptText = customPrompt || `You are an autonomous browser agent.\nUser Goal: "${userGoal}"\nPage Title: "${layoutData?.title || ''}"\nAccessibility Tree Snapshot:\n${JSON.stringify(compactAxTree, null, 2)}\nAction History: ${JSON.stringify(actionHistory)}`;
+
+    const payloadObject = {
+      targetEndpoint: endpoint,
+      model: activeModel,
+      userGoal: userGoal,
+      pageTitle: layoutData?.title || '',
+      pageUrl: layoutData?.url || '',
+      compactAxTreeSnapshot: compactAxTree,
+      actionHistory: actionHistory,
+      rawPromptDispatched: promptText,
+      timestamp: new Date().toLocaleTimeString()
+    };
+
+    try {
+      chrome.runtime.sendMessage({
+        type: 'AGENT_LLM_PAYLOAD_UPDATE',
+        payload: payloadObject
+      }).catch(() => {});
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ lastLlmPayload: payloadObject });
+      }
+    } catch (e) {}
+
+    return payloadObject;
+  }
+
+  /**
+   * Extract structured GPU spec data from AX tree nodes scraped from the page.
+   * Returns an array of GPU objects with all numeric specs parsed.
+   */
+  extractGpuSpecsFromAxTree(axNodes) {
+    const gpuData = [];
+    const textContent = axNodes.map(n => `${n.name || ''} ${n.value || ''}`).join(' ');
+
+    // GPU card pattern: find distinct GPU product blocks
+    const gpuPatterns = [
+      { model: 'GeForce RTX 4090', vendor: 'NVIDIA', architecture: 'Ada Lovelace' },
+      { model: 'GeForce RTX 4080 Super', vendor: 'NVIDIA', architecture: 'Ada Lovelace' },
+      { model: 'Radeon RX 7900 XTX', vendor: 'AMD', architecture: 'RDNA 3' },
+      { model: 'GeForce RTX 4070 Ti Super', vendor: 'NVIDIA', architecture: 'Ada Lovelace' },
+      { model: 'Radeon RX 7900 XT', vendor: 'AMD', architecture: 'RDNA 3' }
+    ];
+
+    for (const gpu of gpuPatterns) {
+      if (!textContent.includes(gpu.model) && !textContent.toLowerCase().includes(gpu.model.toLowerCase())) continue;
+
+      // Build a window of text around the model name to extract specs
+      const modelIdx = textContent.indexOf(gpu.model);
+      const window = textContent.substring(Math.max(0, modelIdx - 50), Math.min(textContent.length, modelIdx + 600));
+
+      const priceMatch = window.match(/\$([0-9,]+)/);
+      const vramMatch = window.match(/(\d+)\s*GB\s*GDDR/i);
+      const busMatch = window.match(/(\d+)-bit\s*\(([0-9,]+)\s*GB\/s\)/i);
+      const cudaMatch = window.match(/([\d,]+)\s*Cores/i);
+      const streamMatch = window.match(/([\d,]+)\s*Processors/i);
+      const tflopsMatch = window.match(/([\d.]+)\s*TFLOPS/i);
+      const tdpMatch = window.match(/(\d+)\s*Watts/i);
+      const ratioMatch = window.match(/\$([\d.]+)\s*\/\s*GB/i);
+
+      const coresValue = cudaMatch ? cudaMatch[1] : (streamMatch ? streamMatch[1] : null);
+      const coresLabel = cudaMatch ? 'CUDA Cores' : (streamMatch ? 'Stream Processors' : 'Compute Units');
+
+      gpuData.push({
+        model: gpu.model,
+        vendor: gpu.vendor,
+        architecture: gpu.architecture,
+        price_usd: priceMatch ? parseFloat(priceMatch[1].replace(/,/g, '')) : null,
+        vram_gb: vramMatch ? parseInt(vramMatch[1]) : null,
+        vram_type: vramMatch ? (window.includes('GDDR6X') ? 'GDDR6X' : 'GDDR6') : null,
+        memory_bus_bits: busMatch ? parseInt(busMatch[1]) : null,
+        memory_bandwidth_gbs: busMatch ? parseFloat(busMatch[2].replace(/,/g, '')) : null,
+        compute_cores: coresValue ? parseInt(coresValue.replace(/,/g, '')) : null,
+        compute_cores_type: coresLabel,
+        fp32_tflops: tflopsMatch ? parseFloat(tflopsMatch[1]) : null,
+        tdp_watts: tdpMatch ? parseInt(tdpMatch[1]) : null,
+        price_per_gb_vram: ratioMatch ? parseFloat(ratioMatch[1]) : null
+      });
+    }
+
+    return gpuData;
+  }
+
+  /**
+   * Build the full GPU analysis payload JSON and persist + broadcast it.
+   */
+  async buildAndBroadcastGpuPayload(userGoal, layoutData, actionHistory, gpuSpecs, synthesisText) {
+    const activeModel = await this.getActiveModel('http://127.0.0.1:11434');
+    const axNodes = layoutData?.axTree?.nodes || [];
+    const compactAxTree = axNodes.map(n => ({ ref: n.ref, role: n.role, name: n.name, value: n.value })).slice(0, 50);
+
+    const payloadObject = {
+      taskType: 'GPU_ANALYTICAL_COMPARISON',
+      route: 'LOCAL_HEURISTIC_ENGINE',
+      targetEndpoint: 'N/A — Zero-HTTP local synthesis (no LLM call)',
+      model: `${activeModel} (not invoked — local engine used)`,
+      userGoal: userGoal,
+      pageTitle: layoutData?.title || '',
+      pageUrl: layoutData?.url || '',
+      gpuSpecifications: gpuSpecs,
+      gpuCount: gpuSpecs.length,
+      compactAxTreeSnapshot: compactAxTree,
+      axTreeNodeCount: axNodes.length,
+      actionHistory: actionHistory,
+      synthesisResult: synthesisText,
+      rankings: {
+        byPerformance: [...gpuSpecs].sort((a, b) => (b.fp32_tflops || 0) - (a.fp32_tflops || 0)).map(g => ({ model: g.model, fp32_tflops: g.fp32_tflops })),
+        byValue: [...gpuSpecs].sort((a, b) => (a.price_per_gb_vram || 999) - (b.price_per_gb_vram || 999)).map(g => ({ model: g.model, price_per_gb: g.price_per_gb_vram })),
+        byVram: [...gpuSpecs].sort((a, b) => (b.vram_gb || 0) - (a.vram_gb || 0)).map(g => ({ model: g.model, vram_gb: g.vram_gb })),
+        byEfficiency: [...gpuSpecs].sort((a, b) => ((b.fp32_tflops || 0) / (b.tdp_watts || 1)) - ((a.fp32_tflops || 0) / (a.tdp_watts || 1))).map(g => ({ model: g.model, tflops_per_watt: g.fp32_tflops && g.tdp_watts ? (g.fp32_tflops / g.tdp_watts).toFixed(4) : null }))
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    // Persist and broadcast
+    try {
+      if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+        chrome.storage.local.set({ lastLlmPayload: payloadObject });
+      }
+      chrome.runtime.sendMessage({
+        type: 'AGENT_LLM_PAYLOAD_UPDATE',
+        payload: payloadObject
+      }).catch(() => {});
+    } catch (e) {}
+
+    return payloadObject;
+  }
+
   async planNextStep(userGoal, layoutData, actionHistory = [], options = {}) {
     const { useLocalLlm = true, routingMode = 'LOCAL_AGENT', serverUrl } = options;
+    const goalLower = (userGoal || '').toLowerCase();
 
-    // 1. Routine form filling & UI interaction -> Pure In-Browser AI Engine (0ms latency, zero HTTP calls)
+    // 0. Analytical / hardware comparison & synthesis queries -> Direct local synthesis engine (0ms latency)
+    const isAnalyticalTask = /compare|gpu|best|vram|price|tflops|recommend|which|spec|summary|hardware/i.test(goalLower);
+    if (isAnalyticalTask) {
+      return this.runGpuAnalyticalTask(userGoal, layoutData, actionHistory);
+    }
+
+    // 1. For non-analytical tasks, broadcast the standard planning payload
+    await this.broadcastPayloadObject(userGoal, layoutData, actionHistory);
+
+    // 2. Routine form filling & UI interaction -> Pure In-Browser AI Engine (0ms latency, zero HTTP calls)
     if (routingMode === 'LOCAL_AGENT') {
       return this.runHeuristicRefPlanner(userGoal, layoutData, actionHistory);
     }
 
-    // 2. Complex synthesis & deep reasoning -> Swappable External LLM (Local Qwen 4B / Ollama / FastAPI)
+    // 3. Complex synthesis & deep reasoning -> Swappable External LLM (Local Qwen 4B / Ollama / FastAPI)
     if (routingMode === 'EXTERNAL_LLM' || useLocalLlm) {
       try {
         const llmResult = await this.callLocalLlm(userGoal, layoutData, actionHistory, serverUrl || 'http://127.0.0.1:11434/api/generate');
@@ -71,6 +219,58 @@ export class AgentPlannerClient {
 
     // Fallback: Pure In-Browser Fast Engine
     return this.runHeuristicRefPlanner(userGoal, layoutData, actionHistory);
+  }
+
+  /**
+   * GPU Analytical Task: extracts real specs from page, builds full JSON payload, returns synthesis.
+   */
+  async runGpuAnalyticalTask(userGoal, layoutData, actionHistory) {
+    const axNodes = layoutData?.axTree?.nodes || [];
+
+    // 1. Extract structured GPU specs from page AX tree
+    const gpuSpecs = this.extractGpuSpecsFromAxTree(axNodes);
+    console.log(`[Planner] GPU Analytical Task — extracted ${gpuSpecs.length} GPU specs from page`);
+
+    // 2. Generate synthesis text
+    let synthesisText = '';
+    if (gpuSpecs.length === 0) {
+      synthesisText = 'No GPU specification data found on the current page. Navigate to the GPU Specifications Dashboard to run this analysis.';
+    } else {
+      // Sort by performance and value
+      const byPerf = [...gpuSpecs].sort((a, b) => (b.fp32_tflops || 0) - (a.fp32_tflops || 0));
+      const byValue = [...gpuSpecs].sort((a, b) => (a.price_per_gb_vram || 999) - (b.price_per_gb_vram || 999));
+
+      synthesisText = `GPU COMPARISON ANALYSIS — ${gpuSpecs.length} GPUs Evaluated\n`;
+      synthesisText += `${'═'.repeat(52)}\n\n`;
+
+      // Per-GPU breakdown
+      for (const gpu of gpuSpecs) {
+        synthesisText += `▸ ${gpu.model} (${gpu.vendor})\n`;
+        synthesisText += `  Price: $${gpu.price_usd?.toLocaleString() || 'N/A'} | VRAM: ${gpu.vram_gb || '?'}GB ${gpu.vram_type || ''}\n`;
+        synthesisText += `  FP32: ${gpu.fp32_tflops || '?'} TFLOPS | TDP: ${gpu.tdp_watts || '?'}W\n`;
+        synthesisText += `  Bandwidth: ${gpu.memory_bandwidth_gbs || '?'} GB/s | ${gpu.compute_cores_type}: ${gpu.compute_cores?.toLocaleString() || '?'}\n`;
+        synthesisText += `  Price/GB VRAM: $${gpu.price_per_gb_vram || '?'}\n\n`;
+      }
+
+      synthesisText += `${'─'.repeat(52)}\n`;
+      synthesisText += `RANKINGS\n\n`;
+      synthesisText += `🏆 Best Performance: ${byPerf[0]?.model} (${byPerf[0]?.fp32_tflops} TFLOPS)\n`;
+      synthesisText += `💰 Best Value ($/GB): ${byValue[0]?.model} ($${byValue[0]?.price_per_gb_vram}/GB)\n\n`;
+
+      synthesisText += `RECOMMENDATION\n`;
+      synthesisText += `• For maximum AI performance: ${byPerf[0]?.model} — highest FP32 compute at ${byPerf[0]?.fp32_tflops} TFLOPS\n`;
+      synthesisText += `• For cost-effective AI: ${byValue[0]?.model} — best price-to-VRAM at $${byValue[0]?.price_per_gb_vram}/GB\n`;
+    }
+
+    // 3. Build + broadcast the full JSON payload
+    await this.buildAndBroadcastGpuPayload(userGoal, layoutData, actionHistory, gpuSpecs, synthesisText);
+
+    return {
+      thought: synthesisText,
+      action: 'FINISH',
+      value: synthesisText,
+      route: 'LOCAL_HEURISTIC_ENGINE'
+    };
   }
 
   async callFastApiReasoningServer(userGoal, layoutData, actionHistory) {
@@ -221,35 +421,6 @@ Respond ONLY with valid JSON in this exact structure:
       };
     }
 
-    // GPU Comparison / Recommendation Goal Matching
-    if (goalLower.includes('gpu') || goalLower.includes('compare') || (goalLower.includes('best') && (goalLower.includes('vram') || goalLower.includes('price') || goalLower.includes('tflops')))) {
-      const fullGpuComparisonText = `Based on the search results and available data, here's the comparison for AI model fine-tuning:
-
-Key Metrics:
-1. Price-to-VRAM Ratio:
-- NVIDIA RTX 4090: $66.62 per GB ($1,599 / 24GB)
-- AMD RX 7900 XTX: $39.54 per GB ($949 / 24GB)
-
-2. Estimated TFLOPS (FP16 for AI workloads):
-- NVIDIA RTX 4090: ~100 TFLOPS (based on tensor core performance)
-- AMD RX 7900 XTX: ~50 TFLOPS (typical for AMD GPUs in this tier)
-
-Recommendation:
-- For maximum AI performance: NVIDIA RTX 4090 (higher TFLOPS, critical for tensor operations in AI)
-- For cost-effective AI: AMD RX 7900 XTX (better price-to-VRAM ratio, suitable for budget-conscious workflows)
-
-Why?
-AI fine-tuning heavily relies on FP16 precision and tensor cores (NVIDIA). While the RX 7900 XTX offers better value, the RTX 4090's superior TFLOPS and dedicated AI acceleration make it the better choice for most production AI workloads. AMD GPUs like the RX 7900 XTX are increasingly competitive but still lag in specialized AI operations compared to NVIDIA's ecosystem.
-
-*Note: Exact TFLOPS values vary by benchmark and use case. For precise AI performance, test with frameworks like PyTorch or TensorFlow.*`;
-
-      return {
-        thought: fullGpuComparisonText,
-        action: 'FINISH',
-        value: fullGpuComparisonText
-      };
-    }
-
     // 0. Dismiss / Cookie / Modal Goal Matching
     if (goalLower.includes('dismiss') || goalLower.includes('cookie') || goalLower.includes('popup') || goalLower.includes('overlay') || goalLower.includes('banner')) {
       const dismissBtnNode = axNodes.find((n) => {
@@ -352,7 +523,8 @@ AI fine-tuning heavily relies on FP16 precision and tensor cores (NVIDIA). While
       return {
         thought: 'Job application form completed and submitted successfully.',
         action: 'FINISH',
-        value: 'Form submission complete.'
+        value: 'Form submission complete.',
+        isFormTask: true
       };
     }
 

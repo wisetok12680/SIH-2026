@@ -3,21 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Global Tech Enterprises - Candidate Application Form</title>
+  <title>Agent - Candidate Application Form</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0b0f19;
-      --card-bg: #161e2e;
-      --card-border: #1e293b;
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
-      --accent-emerald: #059669;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --input-bg: #0f172a;
+      --bg-dark: #0a0a0a;
+      --card-bg: #141414;
+      --card-border: #262626;
+      --card-border-hover: #404040;
+      --input-bg: #1a1a1a;
+      --primary: #e5e5e5;
+      --primary-hover: #ffffff;
+      --text-main: #f5f5f5;
+      --text-muted: #a3a3a3;
+      --text-dim: #737373;
       --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
       --font-mono: 'Fira Code', monospace;
     }
@@ -28,43 +29,113 @@
       font-family: var(--font-sans);
       background: var(--bg-dark);
       color: var(--text-main);
-      padding: 32px 20px;
-      line-height: 1.6;
+      padding: 0;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Shared Navigation Bar */
+    .app-navbar {
+      background: #141414;
+      border-bottom: 1px solid var(--card-border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 1px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+
+    .brand-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #262626;
+      color: #a3a3a3;
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-link {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.15s ease;
+      background: transparent;
+      border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+      color: var(--text-main);
+      background: #262626;
+    }
+
+    .nav-link.active {
+      color: #0a0a0a;
+      background: var(--primary);
+      border-color: var(--primary);
     }
 
     .container {
       max-width: 920px;
-      margin: 0 auto;
+      margin: 32px auto;
+      padding: 0 20px 40px;
     }
 
-    /* Page Header */
+    /* Header Title Card */
     .hero-header {
-      background: #0f172a;
+      background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 24px;
+      border-radius: 8px;
+      padding: 24px 28px;
       margin-bottom: 24px;
+      text-align: center;
     }
 
     .badge-pill {
-      display: inline-flex;
-      align-items: center;
+      display: inline-block;
       padding: 3px 10px;
       border-radius: 4px;
-      font-size: 11px;
+      font-size: 10px;
       font-weight: 700;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      background: #312e81;
-      color: #a5b4fc;
-      border: 1px solid #4338ca;
-      margin-bottom: 10px;
+      background: #262626;
+      color: #d4d4d4;
+      border: 1px solid #404040;
+      margin-bottom: 12px;
     }
 
     .hero-title {
-      font-size: 24px;
+      font-size: 22px;
       font-weight: 700;
-      letter-spacing: -0.4px;
+      letter-spacing: -0.3px;
       color: #ffffff;
       margin-bottom: 6px;
     }
@@ -78,17 +149,17 @@
     .form-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 28px;
       margin-bottom: 24px;
     }
 
     .section-title {
-      font-size: 14px;
+      font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.6px;
-      color: #818cf8;
+      letter-spacing: 0.8px;
+      color: #d4d4d4;
       margin-bottom: 16px;
       padding-bottom: 8px;
       border-bottom: 1px solid var(--card-border);
@@ -112,7 +183,7 @@
 
     .form-label {
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--text-muted);
       margin-bottom: 6px;
       text-transform: uppercase;
@@ -133,7 +204,7 @@
     }
 
     .form-input:focus {
-      border-color: var(--primary);
+      border-color: var(--card-border-hover);
     }
 
     /* Buttons */
@@ -150,60 +221,68 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 10px 20px;
+      padding: 10px 22px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
       border: none;
-      background: var(--primary);
-      color: white;
-      transition: background 0.15s;
-    }
-
-    .btn:hover {
-      background: var(--primary-hover);
+      transition: all 0.15s ease;
     }
 
     .btn-submit {
-      background: var(--accent-emerald);
+      background: var(--primary);
+      color: #0a0a0a;
     }
 
     .btn-submit:hover {
-      background: #047857;
+      background: var(--primary-hover);
     }
 
     .btn-secondary {
-      background: #334155;
+      background: #262626;
       color: var(--text-main);
-      border: 1px solid var(--card-border);
+      border: 1px solid var(--card-border-hover);
     }
 
     .btn-secondary:hover {
-      background: #475569;
+      background: #333333;
     }
 
     .console-out {
-      background: #030712;
+      background: #000000;
       border: 1px solid var(--card-border);
       border-radius: 8px;
       padding: 14px;
       font-family: var(--font-mono);
       font-size: 12px;
-      color: #38bdf8;
+      color: #d4d4d4;
       max-height: 160px;
       overflow-y: auto;
     }
   </style>
 </head>
 <body>
+
+  <!-- Top Shared Navbar -->
+  <nav class="app-navbar">
+    <div class="nav-brand">
+      <span class="brand-logo">Agent</span>
+      <span class="brand-tag">Web App</span>
+    </div>
+    <div class="nav-links">
+      <a href="test-page.html" class="nav-link active">Job Application</a>
+      <a href="gpu-store.html" class="nav-link">GPU Specifications</a>
+    </div>
+  </nav>
+
   <div class="container">
     
     <!-- Header -->
     <header class="hero-header">
       <div class="badge-pill">CAREER PORTAL</div>
-      <h1 class="hero-title">Global Tech Enterprises - Candidate Application</h1>
-      <p class="hero-subtitle">Complete all candidate details below. The Atlas & Comet local agent will process each field agentically.</p>
+      <h1 class="hero-title">Candidate Application</h1>
+      <p class="hero-subtitle">Complete all candidate details below. The Agent will process each field autonomously.</p>
     </header>
 
     <!-- Job Application Form -->
@@ -267,7 +346,7 @@
         </div>
       </div>
 
-      <!-- Section 3: Education & Additional Info -->
+      <!-- Section 3: Education & Work Authorization -->
       <div class="section-title">3. Education & Work Authorization</div>
       <div class="form-grid">
         <div class="form-group">
@@ -309,7 +388,7 @@
       <!-- Section 5: Terms & Action Buttons -->
       <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px;">
         <input type="checkbox" id="jobPrivacyCheck" style="cursor: pointer;" />
-        <label for="jobPrivacyCheck" style="font-size: 13px; cursor: pointer;">
+        <label for="jobPrivacyCheck" style="font-size: 13px; cursor: pointer; color: var(--text-muted);">
           I agree to data processing terms and local PrivScope hardware encryption.
         </label>
       </div>
@@ -319,14 +398,14 @@
           Reset Form Fields
         </button>
         <button type="submit" class="btn btn-submit" id="submitJobAppBtn">
-          Submit Candidate Application
+          Submit Application
         </button>
       </div>
     </form>
 
     <!-- Real-time Console Log Output -->
     <div class="console-out" id="console-output">
-      [System] Enterprise Candidate Application Portal Loaded. Ready for agentic form filling.
+      [System] Candidate Application Portal Loaded. Ready for agentic form filling.
     </div>
 
   </div>
@@ -338,7 +417,7 @@
       const role = document.getElementById('jobRole').value || 'AI Engineer';
 
       logConsole(`APPLICATION SUBMITTED SUCCESSFULLY! Candidate: ${name} (${role}) | Email: ${email}`);
-      alert(`Application Submitted Successfully!\n\nCandidate: ${name}\nRole: ${role}\nEmail: ${email}\nStatus: Processed by Atlas & Comet Agent!`);
+      alert(`Application Submitted Successfully!\n\nCandidate: ${name}\nRole: ${role}\nEmail: ${email}\nStatus: Processed by Agent!`);
     }
 
     function resetForm() {

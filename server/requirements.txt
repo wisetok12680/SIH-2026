@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+requests
+
+# LLM SDKs -- you only strictly need the one you're using,
+# but installing both costs nothing and lets you switch freely.
+openai
+google-generativeai
+
+# lets llm.py read OPENAI_API_KEY / GEMINI_API_KEY from a local .env file
+python-dotenv

@@ -1,112 +1,173 @@
 /**
- * Sidepanel Interface Script - Hybrid Control Center
- * Manages tabs, task controls, Accessibility Ref Tree (@e1, @e2...), Routing badges, PrivScope, and Trajectory Cache.
+ * Agent Sidepanel Control Center
+ * All event binding uses addEventListener (Chrome Extension CSP blocks inline onclick).
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-  const navButtons = document.querySelectorAll('.nav-btn');
-  const tabContents = document.querySelectorAll('.tab-content');
+// ─── UTILITY FUNCTIONS ───
+function escapeHtml(str) {
+  return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function addLogEntry(type, text, timestamp) {
+  const logContainer = document.getElementById('logContainer');
+  if (!logContainer) return;
+  const timeStr = timestamp || new Date().toLocaleTimeString();
+  let colorClass = 'log-info';
+  if (type === 'ERROR') colorClass = 'log-error';
+  else if (type === 'WARN') colorClass = 'log-warn';
+  else if (type === 'SUCCESS' || type === 'FINISHED') colorClass = 'log-success';
+
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${colorClass}`;
+  entry.innerHTML = `<span class="log-time">[${timeStr}]</span> ${escapeHtml(text)}`;
+  logContainer.appendChild(entry);
+  logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+function updateStatusBadge(status, isRunning) {
+  const statusBadge = document.getElementById('agentStatusBadge');
+  if (!statusBadge) return;
+  statusBadge.innerText = status;
+  statusBadge.className = isRunning ? 'status-badge active' : 'status-badge';
+}
+
+function updateRoutingBadge(mode) {
+  const routingBadge = document.getElementById('routingBadge');
+  if (!routingBadge) return;
+  routingBadge.innerText = (mode || 'LOCAL AGENT').replace('_', ' ');
+  routingBadge.className = (mode === 'LOCAL_AGENT') ? 'route-badge local' : 'route-badge cloud';
+}
+
+function resetUiState() {
   const startBtn = document.getElementById('startAgentBtn');
   const stopBtn = document.getElementById('stopAgentBtn');
-  const taskPrompt = document.getElementById('taskPrompt');
-  const logContainer = document.getElementById('logContainer');
-  const clearLogsBtn = document.getElementById('clearLogsBtn');
-  const statusBadge = document.getElementById('agentStatusBadge');
-  const routingBadge = document.getElementById('routingBadge');
-  const backendHealthBadge = document.getElementById('backendHealthBadge');
-  const captchaBanner = document.getElementById('captchaBanner');
-  const jsonViewer = document.getElementById('jsonViewer');
-  const refreshMapBtn = document.getElementById('refreshMapBtn');
-  const scanAxBtn = document.getElementById('scanAxBtn');
+  if (startBtn) startBtn.disabled = false;
+  if (stopBtn) stopBtn.disabled = true;
+  updateStatusBadge('IDLE', false);
+}
+
+function renderAxTree(nodes) {
   const axTreeView = document.getElementById('axTreeView');
-  const axSearchInput = document.getElementById('axSearchInput');
-  const toggleTrajectoryCache = document.getElementById('toggleTrajectoryCache') || { checked: true };
-  const togglePrivScope = document.getElementById('togglePrivScope') || { checked: true };
-  const toggleAutoModals = document.getElementById('toggleAutoModals') || { checked: true };
-  const clearCacheBtn = document.getElementById('clearCacheBtn');
-  const refreshCacheListBtn = document.getElementById('refreshCacheListBtn');
-  const cacheList = document.getElementById('cacheList');
-  const refreshPrivScopeBtn = document.getElementById('refreshPrivScopeBtn');
-  const privscopeView = document.getElementById('privscopeView');
+  if (!axTreeView) return;
+  if (!nodes || nodes.length === 0) {
+    axTreeView.innerHTML = '<div class="empty-state">No accessibility nodes captured.</div>';
+    return;
+  }
+  axTreeView.innerHTML = nodes.slice(0, 40).map((n) => `
+    <div class="ax-node">
+      <span class="ref-tag">${n.ref || '@e'}</span>
+      <span class="node-role">[${n.role || 'element'}]</span>
+      <span class="node-name">${escapeHtml(n.name || n.value || '')}</span>
+    </div>
+  `).join('');
+}
 
-  let currentAxNodes = [];
+function triggerReasoningBuffer(payload) {
+  const bufferCard = document.getElementById('reasoningBufferCard');
+  const respCard = document.getElementById('agentResponseCard');
+  const respBody = document.getElementById('agentResponseBody');
+  const respBadge = document.getElementById('responseBadge');
+  const countdownTag = document.getElementById('bufferCountdownTag');
+  const progressBar = document.getElementById('progressBarFill');
+  const substepText = document.getElementById('bufferSubstepText');
 
-  // 1. Backend Health Check Loop
-  checkBackendHealth();
-  setInterval(checkBackendHealth, 10000);
+  if (!bufferCard || !respCard) return;
 
-  async function checkBackendHealth() {
-    try {
-      const res = await fetch('http://localhost:8000/health');
-      if (res.ok) {
-        if (backendHealthBadge) {
-          backendHealthBadge.innerText = 'ML: ON';
-          backendHealthBadge.className = 'status-badge online';
-        }
-      } else {
-        throw new Error();
-      }
-    } catch (e) {
-      if (backendHealthBadge) {
-        backendHealthBadge.innerText = 'ML: OFF';
-        backendHealthBadge.className = 'status-badge offline';
-      }
+  respCard.style.display = 'none';
+  bufferCard.style.display = 'block';
+
+  let totalDurationSec = 20;
+  let elapsed = 0;
+
+  function updateBufferProgress(elapsed, totalSec) {
+    const remaining = totalSec - elapsed;
+    if (countdownTag) countdownTag.innerText = `${remaining}s Remaining`;
+    if (progressBar) progressBar.style.width = `${(elapsed / totalSec) * 100}%`;
+    if (substepText) {
+      if (elapsed < 7) substepText.innerText = '[1/3] Parsing accessibility tree hardware metrics...';
+      else if (elapsed < 14) substepText.innerText = '[2/3] Computing Price-to-VRAM ratios & FP32 TFLOPS...';
+      else substepText.innerText = '[3/3] Generating final hardware recommendation...';
     }
   }
 
-  // 2. Tab & Sub-Tab Switching Logic
-  navButtons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const targetTab = btn.getAttribute('data-tab');
-      
-      navButtons.forEach((b) => b.classList.remove('active'));
-      tabContents.forEach((tc) => tc.classList.remove('active'));
+  updateBufferProgress(elapsed, totalDurationSec);
 
-      btn.classList.add('active');
-      const targetEl = document.getElementById(targetTab);
-      if (targetEl) targetEl.classList.add('active');
-    });
-  });
+  const bufferInterval = setInterval(() => {
+    elapsed += 1;
+    updateBufferProgress(elapsed, totalDurationSec);
 
-  const advSubBtns = document.querySelectorAll('.adv-subbtn');
-  const advSubContents = document.querySelectorAll('.adv-subcontent');
-
-  advSubBtns.forEach((subBtn) => {
-    subBtn.addEventListener('click', () => {
-      const targetSubtab = subBtn.getAttribute('data-subtab');
-      advSubBtns.forEach((b) => b.classList.remove('active'));
-      advSubContents.forEach((sc) => sc.classList.remove('active'));
-
-      subBtn.classList.add('active');
-      const targetSub = document.getElementById(targetSubtab);
-      if (targetSub) targetSub.classList.add('active');
-
-      if (targetSubtab === 'subtab-config') loadCacheList();
-      if (targetSubtab === 'subtab-priv') loadPrivScopeBindings();
-    });
-  });
-
-  // 4. Start Agent Task
-  startBtn.addEventListener('click', async () => {
-    const taskText = taskPrompt.value.trim();
-    if (!taskText) {
-      addLogEntry('ERROR', 'Please enter a task goal or instruction first.');
-      return;
+    if (elapsed >= totalDurationSec) {
+      clearInterval(bufferInterval);
+      bufferCard.style.display = 'none';
+      if (respBody) {
+        respBody.innerText = payload.value || payload.thought || 'Task completed successfully.';
+      }
+      if (respBadge && payload.route) {
+        respBadge.innerText = payload.route.replace('_', ' ');
+      }
+      respCard.style.display = 'block';
     }
+  }, 1000);
+}
 
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
-    captchaBanner.style.display = 'none';
-    
-    // Hide previous response/buffer cards so trajectory timeline is active
-    const bufferCard = document.getElementById('reasoningBufferCard');
-    const respCard = document.getElementById('agentResponseCard');
-    if (bufferCard) bufferCard.style.display = 'none';
-    if (respCard) respCard.style.display = 'none';
 
-    updateStatusBadge('RUNNING', true);
-    addLogEntry('INFO', `Started task: "${taskText}"`);
+// ─── TAB SWITCHING ───
+function switchTab(tabId) {
+  console.log('[Agent Panel] switchTab:', tabId);
+  document.querySelectorAll('.nav-btn').forEach((b) => {
+    b.classList.toggle('active', b.getAttribute('data-tab') === tabId);
+  });
+  document.querySelectorAll('.tab-content').forEach((tc) => {
+    tc.classList.toggle('active', tc.id === tabId);
+  });
+}
 
+function switchSubtab(subtabId) {
+  console.log('[Agent Panel] switchSubtab:', subtabId);
+  document.querySelectorAll('.adv-subbtn').forEach((sb) => {
+    sb.classList.toggle('active', sb.getAttribute('data-subtab') === subtabId);
+  });
+  document.querySelectorAll('.adv-subcontent').forEach((sc) => {
+    sc.classList.toggle('active', sc.id === subtabId);
+  });
+  if (subtabId === 'subtab-config') loadCacheList();
+  if (subtabId === 'subtab-priv') loadPrivScopeBindings();
+  if (subtabId === 'subtab-llm') loadLlmPayload();
+}
+
+
+// ─── TASK EXECUTION ───
+function startAgentTask() {
+  console.log('[Agent Panel] >>> startAgentTask() FIRED');
+  const taskPrompt = document.getElementById('taskPrompt');
+  const startBtn = document.getElementById('startAgentBtn');
+  const stopBtn = document.getElementById('stopAgentBtn');
+  const captchaBanner = document.getElementById('captchaBanner');
+  const togglePrivScope = document.getElementById('togglePrivScope') || { checked: true };
+  const toggleLocalLlm = document.getElementById('toggleLocalLlm') || { checked: true };
+  const toggleAutoModals = document.getElementById('toggleAutoModals') || { checked: true };
+  const toggleTrajectoryCache = document.getElementById('toggleTrajectoryCache') || { checked: true };
+
+  const taskText = taskPrompt ? taskPrompt.value.trim() : '';
+  if (!taskText) {
+    addLogEntry('ERROR', 'Please enter a task goal or instruction first.');
+    return;
+  }
+
+  if (startBtn) startBtn.disabled = true;
+  if (stopBtn) stopBtn.disabled = false;
+  if (captchaBanner) captchaBanner.style.display = 'none';
+
+  // Hide previous reasoning / response cards
+  const bufferCard = document.getElementById('reasoningBufferCard');
+  const respCard = document.getElementById('agentResponseCard');
+  if (bufferCard) bufferCard.style.display = 'none';
+  if (respCard) respCard.style.display = 'none';
+
+  updateStatusBadge('RUNNING', true);
+  addLogEntry('INFO', `Task started: "${taskText}"`);
+
+  if (typeof chrome !== 'undefined' && chrome.runtime) {
     chrome.runtime.sendMessage(
       {
         type: 'START_AGENT_TASK',
@@ -119,332 +180,227 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       },
       (response) => {
+        if (chrome.runtime.lastError) {
+          addLogEntry('ERROR', 'Message channel error: ' + chrome.runtime.lastError.message);
+          resetUiState();
+          return;
+        }
         if (response?.status !== 'STARTED') {
           addLogEntry('ERROR', response?.message || 'Failed to start agent task.');
           resetUiState();
         }
       }
     );
-  });
+  } else {
+    addLogEntry('WARN', 'chrome.runtime unavailable — running outside extension context.');
+  }
+}
 
-  // 5. Stop Agent Task
-  stopBtn.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ type: 'STOP_AGENT_TASK' }, (response) => {
+function stopAgentTask() {
+  console.log('[Agent Panel] >>> stopAgentTask() FIRED');
+  const captchaBanner = document.getElementById('captchaBanner');
+  if (typeof chrome !== 'undefined' && chrome.runtime) {
+    chrome.runtime.sendMessage({ type: 'STOP_AGENT_TASK' }, () => {
       addLogEntry('WARN', 'Task stopped by user.');
-      captchaBanner.style.display = 'none';
+      if (captchaBanner) captchaBanner.style.display = 'none';
       resetUiState();
     });
-  });
+  }
+}
 
-  // 6. Clear Logs & Clear Cache
-  clearLogsBtn.addEventListener('click', () => {
+function clearLogs() {
+  const logContainer = document.getElementById('logContainer');
+  if (logContainer) {
     logContainer.innerHTML = '<div class="log-entry log-info"><span class="log-time">[System]</span> Logs cleared. Ready for next trajectory.</div>';
-  });
-
-  clearCacheBtn.addEventListener('click', () => {
-    chrome.runtime.sendMessage({ type: 'CLEAR_TRAJECTORY_CACHE' }, (response) => {
-      addLogEntry('SUCCESS', '⚡ Cleared all cached trajectories.');
-      loadCacheList();
-    });
-  });
-
-  if (refreshCacheListBtn) {
-    refreshCacheListBtn.addEventListener('click', loadCacheList);
   }
+}
 
-  if (refreshPrivScopeBtn) {
-    refreshPrivScopeBtn.addEventListener('click', loadPrivScopeBindings);
-  }
 
-  // 7. Manual AX Tree Scan & Search Filter
-  scanAxBtn.addEventListener('click', scanAxTree);
-
-  if (axSearchInput) {
-    axSearchInput.addEventListener('input', (e) => {
-      const query = e.target.value.toLowerCase().trim();
-      if (!query) {
-        renderAxTree(currentAxNodes);
+// ─── SCAN / DATA FETCH HANDLERS ───
+function scanAxTree() {
+  console.log('[Agent Panel] >>> scanAxTree() FIRED');
+  const axTreeView = document.getElementById('axTreeView');
+  if (!axTreeView) return;
+  axTreeView.innerHTML = '<div class="empty-state">Scanning Accessibility Tree...</div>';
+  if (typeof chrome !== 'undefined' && chrome.runtime) {
+    chrome.runtime.sendMessage({ type: 'GET_CURRENT_LAYOUT' }, (response) => {
+      if (chrome.runtime.lastError) {
+        axTreeView.innerHTML = `<div class="empty-state">Error: ${chrome.runtime.lastError.message}</div>`;
         return;
       }
-
-      const filtered = currentAxNodes.filter((n) => {
-        const refMatch = (n.ref || '').toLowerCase().includes(query);
-        const roleMatch = (n.role || '').toLowerCase().includes(query);
-        const nameMatch = (n.name || '').toLowerCase().includes(query);
-        const tagMatch = (n.tagName || '').toLowerCase().includes(query);
-        return refMatch || roleMatch || nameMatch || tagMatch;
-      });
-
-      renderAxTree(filtered);
-    });
-  }
-
-  function scanAxTree() {
-    axTreeView.innerHTML = '<div class="empty-state">Scanning Accessibility Tree...</div>';
-    chrome.runtime.sendMessage({ type: 'GET_CURRENT_LAYOUT' }, (response) => {
       if (response && response.status === 'SUCCESS' && response.data?.axTree) {
-        currentAxNodes = response.data.axTree.nodes || [];
-        renderAxTree(currentAxNodes);
+        renderAxTree(response.data.axTree.nodes || []);
       } else {
         axTreeView.innerHTML = `<div class="empty-state">Error scanning AX Tree: ${response?.error || 'Active tab unavailable'}</div>`;
       }
     });
   }
+}
 
-  // 8. Manual Physical Map Scan
-  refreshMapBtn.addEventListener('click', () => {
-    jsonViewer.innerText = 'Scanning physical screen layout...';
+function refreshMap() {
+  console.log('[Agent Panel] >>> refreshMap() FIRED');
+  const jsonViewer = document.getElementById('jsonViewer');
+  if (jsonViewer) jsonViewer.innerText = 'Scanning physical screen layout...';
+  if (typeof chrome !== 'undefined' && chrome.runtime) {
     chrome.runtime.sendMessage({ type: 'GET_CURRENT_LAYOUT' }, (response) => {
-      if (response && response.status === 'SUCCESS') {
-        jsonViewer.innerText = JSON.stringify(response.data, null, 2);
-      } else {
-        jsonViewer.innerText = `Error scanning layout: ${response?.error || 'Active tab unavailable'}`;
+      if (chrome.runtime.lastError) {
+        if (jsonViewer) jsonViewer.innerText = `Error: ${chrome.runtime.lastError.message}`;
+        return;
       }
+      if (response && response.status === 'SUCCESS') {
+        if (jsonViewer) jsonViewer.innerText = JSON.stringify(response.data, null, 2);
+      } else {
+        if (jsonViewer) jsonViewer.innerText = `Error scanning layout: ${response?.error || 'Active tab unavailable'}`;
+      }
+    });
+  }
+}
+
+function loadLlmPayload() {
+  const llmPayloadViewer = document.getElementById('llmPayloadViewer');
+  if (!llmPayloadViewer) return;
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.get(['lastLlmPayload'], (res) => {
+      if (res && res.lastLlmPayload) {
+        llmPayloadViewer.innerText = JSON.stringify(res.lastLlmPayload, null, 2);
+      }
+    });
+  }
+}
+
+function loadPrivScopeBindings() {
+  const privscopeView = document.getElementById('privscopeView');
+  if (!privscopeView) return;
+  privscopeView.innerHTML = `
+    <div class="binding-item"><span class="bind-key">$BIND_EMAIL_ADDR_0</span><span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span></div>
+    <div class="binding-item"><span class="bind-key">$BIND_CARD_NUM_1</span><span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span></div>
+    <div class="binding-item"><span class="bind-key">$BIND_SSN_ID_2</span><span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span></div>
+  `;
+}
+
+function clearTrajectoryCache() {
+  if (typeof chrome !== 'undefined' && chrome.runtime) {
+    chrome.runtime.sendMessage({ type: 'CLEAR_TRAJECTORY_CACHE' }, () => {
+      addLogEntry('SUCCESS', '⚡ Cleared all cached trajectories.');
+      loadCacheList();
+    });
+  }
+}
+
+function loadCacheList() {
+  const cacheList = document.getElementById('cacheList');
+  if (!cacheList) return;
+  cacheList.innerHTML = '<div class="empty-state">Loading cached trajectories...</div>';
+  if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
+    chrome.storage.local.get(null, (allStorage) => {
+      const trajKeys = Object.keys(allStorage).filter((k) => k.startsWith('traj_'));
+      if (trajKeys.length === 0) {
+        cacheList.innerHTML = '<div class="empty-state">No cached trajectories found.</div>';
+        return;
+      }
+      cacheList.innerHTML = trajKeys.map((key) => {
+        return `<div class="cache-item"><div><span class="cache-domain">${key}</span></div></div>`;
+      }).join('');
+    });
+  }
+}
+
+
+// ──────────────────────────────────────────────────
+//  EVENT BINDING — All via addEventListener (CSP-safe)
+// ──────────────────────────────────────────────────
+function bindAllEvents() {
+  console.log('[Agent Panel] bindAllEvents() — attaching listeners');
+
+  // ── Primary action buttons ──
+  const startBtn = document.getElementById('startAgentBtn');
+  const stopBtn = document.getElementById('stopAgentBtn');
+  const clearLogsBtn = document.getElementById('clearLogsBtn');
+
+  if (startBtn) startBtn.addEventListener('click', () => { console.log('[Agent Panel] Start btn click'); startAgentTask(); });
+  if (stopBtn) stopBtn.addEventListener('click', () => { console.log('[Agent Panel] Stop btn click'); stopAgentTask(); });
+  if (clearLogsBtn) clearLogsBtn.addEventListener('click', () => { clearLogs(); });
+
+  // ── Advanced tools buttons ──
+  const scanAxBtn = document.getElementById('scanAxBtn');
+  const refreshMapBtn = document.getElementById('refreshMapBtn');
+  const refreshLlmPayloadBtn = document.getElementById('refreshLlmPayloadBtn');
+  const refreshPrivScopeBtn = document.getElementById('refreshPrivScopeBtn');
+  const clearCacheBtn = document.getElementById('clearCacheBtn');
+
+  if (scanAxBtn) scanAxBtn.addEventListener('click', () => { console.log('[Agent Panel] Scan AX btn click'); scanAxTree(); });
+  if (refreshMapBtn) refreshMapBtn.addEventListener('click', () => { console.log('[Agent Panel] Refresh Map btn click'); refreshMap(); });
+  if (refreshLlmPayloadBtn) refreshLlmPayloadBtn.addEventListener('click', () => { loadLlmPayload(); });
+  if (refreshPrivScopeBtn) refreshPrivScopeBtn.addEventListener('click', () => { loadPrivScopeBindings(); });
+  if (clearCacheBtn) clearCacheBtn.addEventListener('click', () => { clearTrajectoryCache(); });
+
+  // ── Top nav tabs ──
+  document.querySelectorAll('.nav-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tabId = btn.getAttribute('data-tab');
+      if (tabId) switchTab(tabId);
     });
   });
 
-  // 9. Load Trajectory Cache Items
-  async function loadCacheList() {
-    if (!cacheList) return;
-    cacheList.innerHTML = '<div class="empty-state">Loading cached trajectories...</div>';
+  // ── Advanced sub-tabs ──
+  document.querySelectorAll('.adv-subbtn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const subtabId = btn.getAttribute('data-subtab');
+      if (subtabId) switchSubtab(subtabId);
+    });
+  });
 
-    chrome.storage.local.get(null, (allStorage) => {
-      const trajKeys = Object.keys(allStorage).filter((k) => k.startsWith('traj_'));
-
-      if (trajKeys.length === 0) {
-        cacheList.innerHTML = '<div class="empty-state">No cached trajectories found in local storage.</div>';
-        return;
-      }
-
-      cacheList.innerHTML = trajKeys.map((key) => {
-        const item = allStorage[key];
-        const stepCount = item.steps ? item.steps.length : 0;
-        return `
-          <div class="cache-item">
-            <div>
-              <span class="cache-domain">${escapeHtml(item.domain || 'Global')}</span>
-              <div class="cache-task">"${escapeHtml(item.task || 'Task')}" (${stepCount} steps)</div>
-            </div>
-            <button class="btn btn-secondary btn-delete-key" data-key="${key}">Delete</button>
-          </div>
-        `;
-      }).join('');
-
-      document.querySelectorAll('.btn-delete-key').forEach((btn) => {
-        btn.addEventListener('click', (e) => {
-          const k = e.target.getAttribute('data-key');
-          chrome.storage.local.remove([k], () => loadCacheList());
-        });
+  // ── AX tree search filter ──
+  const axSearchInput = document.getElementById('axSearchInput');
+  if (axSearchInput) {
+    axSearchInput.addEventListener('input', () => {
+      const query = axSearchInput.value.toLowerCase();
+      document.querySelectorAll('.ax-node').forEach((node) => {
+        node.style.display = node.textContent.toLowerCase().includes(query) ? '' : 'none';
       });
     });
   }
 
-  // 10. Load PrivScope Binding Table Inspector
-  function loadPrivScopeBindings() {
-    if (!privscopeView) return;
-    privscopeView.innerHTML = `
-      <div class="binding-item">
-        <span class="bind-key">$BIND_EMAIL_ADDR_0</span>
-        <span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span>
-      </div>
-      <div class="binding-item">
-        <span class="bind-key">$BIND_CARD_NUM_1</span>
-        <span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span>
-      </div>
-      <div class="binding-item">
-        <span class="bind-key">$BIND_SSN_ID_2</span>
-        <span class="bind-value">[ON_DEVICE_BINDING_PROTECTED]</span>
-      </div>
-    `;
-  }
+  console.log('[Agent Panel] All event listeners bound successfully.');
+}
 
-  // 11. Background Event Listener
+
+// ──────────────────────────────────────────────────
+//  BACKGROUND MESSAGE LISTENER
+// ──────────────────────────────────────────────────
+if (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.onMessage) {
   chrome.runtime.onMessage.addListener((message) => {
     if (message.type === 'AGENT_LOG_UPDATE') {
-      const { phase, message: text, routingMode, cacheHit, timestamp } = message.payload;
+      const { phase, message: text, routingMode, timestamp } = message.payload;
       addLogEntry(phase, text, timestamp);
-
-      if (routingMode) {
-        updateRoutingBadge(routingMode);
-      }
-
-      if (phase === 'CAPTCHA_ALERT') {
-        captchaBanner.style.display = 'flex';
-      } else if (phase === 'RESUMED' || phase === 'FINISHED' || phase === 'STOPPED') {
-        captchaBanner.style.display = 'none';
-      }
-
+      if (routingMode) updateRoutingBadge(routingMode);
       if (phase === 'FINISHED' || phase === 'ERROR' || phase === 'STOPPED') {
         resetUiState();
-        updateStatusBadge(phase, false);
       } else {
         updateStatusBadge(phase, true);
       }
-    } else if (message.type === 'AGENT_LAYOUT_PREVIEW') {
-      jsonViewer.innerText = JSON.stringify(message.payload, null, 2);
-      if (message.payload?.axTree?.nodes) {
-        currentAxNodes = message.payload.axTree.nodes;
-        renderAxTree(currentAxNodes);
-      }
     } else if (message.type === 'AGENT_LLM_PAYLOAD_UPDATE') {
-      const payloadViewer = document.getElementById('llmPayloadViewer');
-      if (payloadViewer) {
-        payloadViewer.innerText = JSON.stringify(message.payload, null, 2);
+      // Only auto-refresh if the user is already on the LLM payload subtab
+      const llmSubtab = document.getElementById('subtab-llm');
+      if (llmSubtab && llmSubtab.classList.contains('active')) {
+        loadLlmPayload();
       }
     } else if (message.type === 'AGENT_FINAL_RESPONSE') {
-      triggerReasoningBuffer(message.payload);
+      if (message.payload && message.payload.isFormTask) {
+        addLogEntry('SUCCESS', 'Form application completed and submitted successfully.');
+      } else {
+        triggerReasoningBuffer(message.payload);
+      }
     }
   });
+}
 
-  let activeBufferInterval = null;
 
-  function triggerReasoningBuffer(payload) {
-    const bufferCard = document.getElementById('reasoningBufferCard');
-    const respCard = document.getElementById('agentResponseCard');
-    const respBody = document.getElementById('agentResponseBody');
-    const respBadge = document.getElementById('responseBadge');
-    const countdownTag = document.getElementById('bufferCountdownTag');
-    const progressBar = document.getElementById('progressBarFill');
-    const substepText = document.getElementById('bufferSubstepText');
-
-    if (!bufferCard || !respCard) return;
-
-    if (activeBufferInterval) clearInterval(activeBufferInterval);
-
-    // Hide conclusion response box during 20s buffer
-    respCard.style.display = 'none';
-    bufferCard.style.display = 'block';
-
-    let totalDurationSec = 20;
-    let elapsed = 0;
-
-    updateBufferProgress(elapsed, totalDurationSec, countdownTag, progressBar, substepText);
-
-    activeBufferInterval = setInterval(() => {
-      elapsed += 1;
-      updateBufferProgress(elapsed, totalDurationSec, countdownTag, progressBar, substepText);
-
-      if (elapsed >= totalDurationSec) {
-        clearInterval(activeBufferInterval);
-        activeBufferInterval = null;
-
-        // Reveal final conclusion response box after 20 seconds
-        bufferCard.style.display = 'none';
-        if (respBody) {
-          respBody.innerText = payload.value || payload.thought || 'Task completed successfully.';
-        }
-        if (respBadge && payload.route) {
-          respBadge.innerText = payload.route.replace('_', ' ');
-        }
-        respCard.style.display = 'block';
-      }
-    }, 1000);
-  }
-
-  function updateBufferProgress(elapsed, totalSec, countdownTag, progressBar, substepText) {
-    const remaining = totalSec - elapsed;
-    if (countdownTag) countdownTag.innerText = `${remaining}s Remaining`;
-    if (progressBar) progressBar.style.width = `${(elapsed / totalSec) * 100}%`;
-
-    let stepMsg = '';
-    if (elapsed === 0) {
-      stepMsg = '[1/3] Parsing accessibility tree hardware metrics...';
-    } else if (elapsed === 7) {
-      stepMsg = '[2/3] Evaluating price-to-VRAM ratios & FP16 TFLOPS with local Qwen 4B...';
-    } else if (elapsed === 14) {
-      stepMsg = '[3/3] Compiling executive synthesis recommendation...';
-    }
-
-    if (stepMsg) {
-      if (substepText) substepText.innerText = stepMsg;
-      addLogEntry('INFO', `[Reasoning ${elapsed}s/${totalSec}s] ${stepMsg}`);
-    }
-  }
-
-  const refreshLlmPayloadBtn = document.getElementById('refreshLlmPayloadBtn');
-  if (refreshLlmPayloadBtn) {
-    refreshLlmPayloadBtn.addEventListener('click', () => {
-      chrome.storage.local.get(['lastLlmPayload'], (res) => {
-        const payloadViewer = document.getElementById('llmPayloadViewer');
-        if (payloadViewer) {
-          if (res.lastLlmPayload) {
-            payloadViewer.innerText = JSON.stringify(res.lastLlmPayload, null, 2);
-          } else {
-            payloadViewer.innerText = 'No LLM payload recorded yet in local storage.';
-          }
-        }
-      });
-    });
-  }
-
-  function renderAxTree(nodes) {
-    if (!nodes || nodes.length === 0) {
-      axTreeView.innerHTML = '<div class="empty-state">No interactive accessibility nodes found matching criteria.</div>';
-      return;
-    }
-
-    axTreeView.innerHTML = nodes.map((n) => `
-      <div class="ax-node">
-        <span class="ref-tag">${n.ref}</span>
-        <span class="node-role">[${escapeHtml(n.role)}]</span>
-        <span class="node-name" title="${escapeHtml(n.name)}">${escapeHtml(n.name || n.value || '<unnamed>')}</span>
-      </div>
-    `).join('');
-  }
-
-  function addLogEntry(phase, text, timeStr) {
-    const time = timeStr || new Date().toLocaleTimeString();
-    const entry = document.createElement('div');
-    entry.className = `log-entry ${getLogClass(phase)}`;
-    entry.innerHTML = `<span class="log-time">[${time}]</span> ${escapeHtml(text)}`;
-    
-    logContainer.appendChild(entry);
-    logContainer.scrollTop = logContainer.scrollHeight;
-  }
-
-  function getLogClass(phase) {
-    switch (phase) {
-      case 'FINISHED':
-      case 'SUCCESS':
-      case 'CACHE_HIT':
-        return 'log-success';
-      case 'ERROR':
-      case 'CAPTCHA_ALERT':
-        return 'log-error';
-      case 'WARN':
-      case 'STOPPED':
-      case 'PAUSED':
-        return 'log-warn';
-      default:
-        return 'log-info';
-    }
-  }
-
-  function updateStatusBadge(statusText, isActive) {
-    statusBadge.innerText = statusText;
-    if (isActive) {
-      statusBadge.classList.add('active');
-    } else {
-      statusBadge.classList.remove('active');
-    }
-  }
-
-  function updateRoutingBadge(mode) {
-    routingBadge.innerText = mode.replace('_', ' ');
-    if (mode === 'LOCAL_AGENT') {
-      routingBadge.className = 'route-badge local';
-    } else {
-      routingBadge.className = 'route-badge cloud';
-    }
-  }
-
-  function resetUiState() {
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-    updateStatusBadge('IDLE', false);
-  }
-
-  function escapeHtml(str) {
-    return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  }
-});
+// ──────────────────────────────────────────────────
+//  INITIALIZATION
+// ──────────────────────────────────────────────────
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', bindAllEvents);
+} else {
+  bindAllEvents();
+}
