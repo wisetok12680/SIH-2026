@@ -15,6 +15,13 @@ An autonomous, privacy-preserving agent system designed for physical layout pars
   - [Architecture & Flow](#architecture--flow)
   - [Policy Guardrails](#policy-guardrails)
   - [Multi-Provider LLM Integration](#multi-provider-llm-integration)
+- [Hardware and Compute Requirements](#hardware-and-compute-requirements)
+  - [1. Architecture and Where Each Part Runs](#1-architecture-and-where-each-part-runs)
+  - [2. Requirements by Component](#2-requirements-by-component)
+  - [3. Live Benchmark & Empirical Measurements](#3-live-benchmark--empirical-measurements)
+  - [4. Research Recommendation: Lightweight Client-Side Vision](#4-research-recommendation-lightweight-client-side-vision)
+  - [5. Optional Edge Deployment](#5-optional-edge-deployment)
+  - [6. Privacy Rationale](#6-privacy-rationale)
 - [Quick Start](#quick-start)
   - [1. Install uv](#1-install-uv)
   - [2. Clone the Repository](#2-clone-the-repository)
@@ -185,6 +192,95 @@ The reasoning engine strictly selects from the following schema-enforced actions
 - `wait`: Pause for dynamic DOM or asynchronous network operations.
 - `finish`: Conclude the task when the goal is achieved.
 - `ask_user`: Safely request human input when uncertainty arises or sensitive actions are encountered.
+
+---
+
+## Hardware and Compute Requirements
+
+### 1. Architecture and Where Each Part Runs
+
+The agent follows a **DOM-first architecture**. A Chrome extension reads the page's DOM and accessibility tree, builds a structured map of interactive elements, and redacts personal data locally before anything is passed to a model. Vision models are invoked only for content the DOM cannot describe, such as `<canvas>`, embedded PDFs, or image-based controls.
+
+- **Chrome Extension (Client)**:
+  - **Responsibilities**: Accessibility-tree parser, layout extractor, 11-pattern PII filter (email, phone, card, SSN, PAN, Aadhaar, tokens, GSTIN, passport, driving licence, medical identifiers), rule-based hybrid router, trajectory cache, action executor, and side panel.
+  - **Stack**: Plain JavaScript — zero model download, zero GPU required.
+- **Local LLM (Client Machine)**:
+  - **Responsibilities**: Local reasoning and privacy-preserving action planning.
+  - **Stack**: Ollama on `127.0.0.1:11434` with default model `qwen3:4b`. The extension also automatically detects any installed Qwen variant.
+- **Local Vision Service (`backend/`, FastAPI)**:
+  - **Responsibilities**: Visual fallback using YOLO (`yolov8n` nano weights via Ultralytics) for UI element bounding boxes, EasyOCR in CPU mode for embedded text, and an OpenCV contour fallback.
+  - **Auxiliary Endpoints**: Exposes a rule-based `/reason` endpoint with deterministic policy verification and a `/api/sanitize-pii` endpoint. *(Note: The extension does not stream screenshots to this endpoint during standard execution; screenshots are currently captured for side-panel preview).*
+- **Reasoning Server (`server/`, FastAPI)**:
+  - **Responsibilities**: Stateless planner bridging the sanitized page map with Google Gemini 2.5 Flash or OpenAI GPT-4o-mini, validating returned actions against the active DOM policy guardrail before execution.
+- **Training Scripts (`scripts/`)**:
+  - **Responsibilities**: QLoRA fine-tuning of `Qwen2.5-0.5B-Instruct` for localized PII redaction, synthetic dataset generation, and an Ollama `Modelfile` for bundling local PII SLMs.
+
+---
+
+### 2. Requirements by Component
+
+| Component | Minimum Hardware | Recommended | GPU Needed? | Footprint / Notes |
+| :--- | :--- | :--- | :---: | :--- |
+| **Extension (DOM Path)** | Any machine running modern Chrome | 4 GB+ RAM | No | Negligible CPU/memory load; pure JS DOM script. |
+| **Local LLM (Ollama)** | Quad-core CPU, 8 GB RAM | 16 GB RAM, modern multi-core CPU | Optional (accelerates gen speed) | `qwen3:4b` is ~2.5 GB on disk (4-bit quantized); allocates ~3.0–3.5 GB active RAM during inference. |
+| **Local Vision (`backend/`)** | Dual-core CPU, 4 GB RAM | Quad-core CPU, 8 GB RAM | No (runs CPU-only `gpu=False`) | PyTorch + OpenCV + EasyOCR runtime; models load lazily on first request. |
+| **Reasoning Server (`server/`)** | 1–2 vCPU, 2 GB RAM | 2 vCPU, 4 GB RAM | No | Outbound HTTPS calls to Gemini/OpenAI; requires internet access and API key. |
+| **PII Model Training (`scripts/`)** | NVIDIA GPU with CUDA (>=6 GB VRAM) | 8 GB+ VRAM (RTX 3060/4060 or Colab T4) | **Yes (CUDA)** | QLoRA 4-bit (bitsandbytes), fp16, rank 16, batch size 2, 4 grad-accum steps, 512 context length. |
+
+---
+
+### 3. Live Benchmark & Empirical Measurements
+
+Empirical measurements gathered on a baseline test environment (**Windows 11 AMD64, 15.3 GB RAM, 6-core/12-thread CPU**, using [`benchmark.py`](file:///c:/Users/sriva/SIH-2026/benchmark.py)):
+
+#### Latency & Throughput Profile
+
+| Subsystem / Endpoint | Runs | Median (ms) | P95 (ms) | Min (ms) | Max (ms) | Throughput / Speed |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Ollama `qwen3:4b` (128 tokens)** | 3 | **5585.7 ms** | 5820.4 ms | 5567.8 ms | 5820.4 ms | **~22.7 – 74.1 tokens/sec** |
+| **Backend Visual ML (`/api/visual-ml/inspect`)** | 3 | **19.3 ms** | 20.3 ms | 15.3 ms | 20.3 ms | Sub-25ms UI contour extraction |
+| **Backend Rule Reasoner (`/reason`)** | 3 | **3.5 ms** | 4.3 ms | 3.1 ms | 4.3 ms | Deterministic policy matching |
+| **Backend PII Redaction (`/api/sanitize-pii`)** | 3 | **3.0 ms** | 3.2 ms | 3.0 ms | 3.2 ms | 11 sensitive entity patterns |
+
+#### Resident Memory (RSS) Footprint
+
+| Process | Idle RAM (RSS) | Active Peak RAM | Role |
+| :--- | :---: | :---: | :--- |
+| **Ollama Daemon (`ollama`)** | ~27 MB | **~3,364 MB** | Loaded quantized weights & KV cache for `qwen3:4b` |
+| **ML Backend (`uvicorn main:app`)** | ~52 MB | **~70 MB** | Vision fallback, OpenCV edge detector, PII parser |
+| **Reasoning Server (`uvicorn app:app`)** | ~43 MB | **~64 MB** | FastAPI planner, JSON schemas, policy validator |
+
+---
+
+### 4. Research Recommendation: Lightweight Client-Side Vision
+
+The current prototype provides a Python vision fallback service (`backend/`). For mass consumer deployment on everyday laptops without requiring local Python or PyTorch installations, architecture research recommends running lightweight vision directly in the browser via **ONNX Runtime Web (WebAssembly / WebGL)**:
+
+- **UI Detector**: **YOLOX-Nano** (~0.91M parameters, ~4 MB as an ONNX file) under the **Apache 2.0** license. *(Note: Ultralytics YOLO is AGPL-3.0, posing distribution constraints. Released weights are COCO-trained, requiring fine-tuning on a UI widget dataset).*
+- **Text Recognition**: **PP-OCRv5 mobile** (detection model 4.7 MB with Hmean 79.0%; recognition model 16 MB with 81.29% average accuracy on PaddleOCR benchmarks; English-specific `en_PP-OCRv5_mobile_rec` achieves 85.3%). Both models total ~21 MB on disk and are licensed under **Apache 2.0**.
+- **Deployment Advantages**:
+  - Eliminates the ~4 GB Python/PyTorch runtime dependency entirely.
+  - Total on-disk model weight footprint drops to **~25 MB**.
+  - **Absolute Privacy**: Screen pixels never leave the client's browser sandbox.
+
+---
+
+### 5. Optional Edge Deployment
+
+The entire stack can be hosted on dedicated low-power edge hardware:
+- **NVIDIA Jetson Orin Nano Super**: 8 GB 128-bit LPDDR5, up to 67 INT8 sparse TOPS (33 dense TOPS), configurable between 7W and 25W. Can host both the vision pipeline and a 4-bit SLM concurrently.
+- **Raspberry Pi 5 (8 GB)**: Low-cost CPU-only alternative capable of running the DOM extraction and client-side ONNX vision stack.
+
+---
+
+### 6. Privacy Rationale
+
+Recent research by Ukani et al., *"Privacy Practices of Browser Agents"* ([arXiv:2512.07725](https://arxiv.org/abs/2512.07725)), audited eight prominent browser agents and identified **30 critical privacy vulnerabilities**, including sensitive personal identifiers being inadvertently autocompleted or leaked to external LLM providers.
+
+Agentic Browser addresses these vulnerabilities architecturally:
+1. **Client-Side Redaction**: DOM content and input fields are filtered inside the extension via 11 regex and structural patterns before data ever exits the active browser tab.
+2. **Hybrid Sensitive Routing**: Workflows handling sensitive data are confined to the local SLM (Ollama), preventing sensitive payloads from traversing third-party cloud APIs.
+3. **Local LLM Isolation**: With the local model enabled, no web text, user inputs, or navigation trajectories leave the physical machine.
 
 ---
 
